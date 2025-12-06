@@ -14,6 +14,9 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
     exit 1
 fi
 
+echo "✅ Oh My Zsh is installed"
+echo ""
+
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
 # Install zsh-autosuggestions
@@ -45,6 +48,7 @@ else
 fi
 
 echo ""
+
 echo "🎉 Plugin installation complete!"
 echo ""
 echo "💡 Next steps:"
@@ -54,3 +58,4 @@ echo ""
 echo "📝 Installed plugins:"
 echo "  • zsh-autosuggestions   - Fish-like autosuggestions"
 echo "  • zsh-syntax-highlighting - Syntax highlighting for commands"
+echo ""

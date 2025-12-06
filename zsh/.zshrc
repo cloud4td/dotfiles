@@ -5,7 +5,8 @@
 export ZSH="$HOME/.oh-my-zsh"
 
 # Theme
-ZSH_THEME="robbyrussell"
+# ZSH_THEME="robbyrussell"  # Disabled to use custom prompt
+ZSH_THEME=""  # Use custom prompt from prompt.zsh
 
 # Case-sensitive completion
 # CASE_SENSITIVE="true"
@@ -39,16 +40,26 @@ ZSH_THEME="robbyrussell"
 
 # Plugins
 plugins=(
-  git                 # Git aliases and functions
-  docker              # Docker aliases and completions
-  docker-compose      # Docker Compose aliases
-  kubectl             # Kubernetes aliases and completions
-  # aws               # AWS CLI completions
-  # terraform         # Terraform aliases and completions
-  # node              # Node.js aliases
-  # npm               # NPM completions
-  zsh-autosuggestions # Fish-like autosuggestions (install: git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions)
-  zsh-syntax-highlighting # Syntax highlighting (install: git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting)
+  git                     # Git aliases and functions
+  gitfast                 # Faster Git completions
+  git-extras              # Extra Git utilities
+  docker                  # Docker aliases and completions
+  docker-compose          # Docker Compose aliases
+  kubectl                 # Kubernetes aliases and completions
+  colored-man-pages       # Colorize man pages
+  command-not-found       # Suggest package for missing commands
+  extract                 # Universal archive extractor
+  sudo                    # Press ESC twice to add sudo
+  web-search              # Search from terminal (google, github, etc.)
+  copypath                # Copy current path to clipboard
+  copyfile                # Copy file content to clipboard
+  dirhistory              # Navigate directory history (Alt+Left/Right)
+  # aws                   # AWS CLI completions
+  # terraform             # Terraform aliases and completions
+  # node                  # Node.js aliases
+  # npm                   # NPM completions
+  zsh-autosuggestions     # Fish-like autosuggestions
+  zsh-syntax-highlighting # Syntax highlighting
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -88,6 +99,9 @@ bindkey '^[[3~' delete-char             # Delete
 # Load custom configurations
 DOTFILES_DIR="$HOME/dotfiles"
 
+# Load custom prompt (must load before other customizations)
+[ -f "$DOTFILES_DIR/zsh/prompt.zsh" ] && source "$DOTFILES_DIR/zsh/prompt.zsh"
+
 # Load aliases
 [ -f "$DOTFILES_DIR/zsh/aliases.zsh" ] && source "$DOTFILES_DIR/zsh/aliases.zsh"
 
@@ -107,12 +121,38 @@ export GPG_TTY=$(tty)
 # Color support for ls and grep
 export CLICOLOR=1
 export LSCOLORS=GxFxCxDxBxegedabagaced
+export LS_COLORS='di=1;36:ln=1;35:so=1;32:pi=1;33:ex=1;31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=34;43'
 
 # Aliases for colored output
 alias ls='ls -G'
+alias ll='ls -lhG'
+alias la='ls -lahG'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
+
+# Better directory listing with exa if available
+if command -v exa &> /dev/null; then
+    alias ls='exa --icons --group-directories-first'
+    alias ll='exa -l --icons --group-directories-first --git'
+    alias la='exa -la --icons --group-directories-first --git'
+    alias lt='exa -T --icons --group-directories-first'
+    alias tree='exa -T --icons'
+fi
+
+# Git aliases (in addition to Oh My Zsh git plugin)
+alias gst='git status'
+alias gss='git status -s'
+alias glog='git log --oneline --graph --decorate --all'
+alias gd='git diff'
+alias gds='git diff --staged'
+alias gcm='git commit -m'
+alias gca='git commit --amend'
+alias gp='git push'
+alias gpl='git pull'
+alias gco='git checkout'
+alias gb='git branch'
+alias gba='git branch -a'
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"

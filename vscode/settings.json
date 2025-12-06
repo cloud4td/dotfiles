@@ -186,5 +186,6 @@
     }
   ],
   "snyk.advanced.cliPath": "/Users/cloud/Library/Application Support/snyk/vscode-cli/snyk-macos-arm64",
-  "snyk.trustedFolders": ["/Users/cloud/work/talkdesk/code/dotfiles"]
+  "snyk.trustedFolders": ["/Users/cloud/work/talkdesk/code/dotfiles"],
+  "snyk.yesWelcomeNotification": false
 }

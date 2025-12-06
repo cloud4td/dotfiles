@@ -14,3 +14,6 @@ alias docker-compose=podman-compose
 alias pc=podman-compose
 alias pps='podman ps'
 alias pimg='podman images'
+
+# VPN Proxy Settings
+alias vpn_on="export https_proxy=http://127.0.0.1:8234;export http_proxy=http://127.0.0.1:8234;export all_proxy=socks5://127.0.0.1:8235"
