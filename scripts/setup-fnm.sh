@@ -58,6 +58,61 @@ echo "   npm version:  $(npm --version)"
 echo "   Location:     $(which node)"
 echo ""
 
+# Setup package managers (Yarn and pnpm)
+echo "📦 Setting up package managers..."
+echo ""
+
+# Enable Corepack (built-in since Node.js 16.10)
+if command -v corepack &> /dev/null; then
+    echo "🔧 Enabling Corepack for Yarn and pnpm..."
+    corepack enable
+    
+    # Install Yarn via Corepack
+    if ! command -v yarn &> /dev/null; then
+        echo "📦 Installing Yarn via Corepack..."
+        corepack prepare yarn@stable --activate
+        echo "✅ Yarn installed: $(yarn --version)"
+    else
+        echo "✅ Yarn is already available: $(yarn --version)"
+    fi
+    
+    # Install pnpm via Corepack
+    if ! command -v pnpm &> /dev/null; then
+        echo "📦 Installing pnpm via Corepack..."
+        corepack prepare pnpm@latest --activate
+        echo "✅ pnpm installed: $(pnpm --version)"
+    else
+        echo "✅ pnpm is already available: $(pnpm --version)"
+    fi
+else
+    echo "⚠️  Corepack not available (requires Node.js 16.10+)"
+    
+    # Fallback to npm global install
+    if ! command -v yarn &> /dev/null; then
+        read -p "Install Yarn globally via npm? (Y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+            npm install -g yarn
+            echo "✅ Yarn installed: $(yarn --version)"
+        fi
+    else
+        echo "✅ Yarn is already available: $(yarn --version)"
+    fi
+    
+    if ! command -v pnpm &> /dev/null; then
+        read -p "Install pnpm globally via npm? (Y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+            npm install -g pnpm
+            echo "✅ pnpm installed: $(pnpm --version)"
+        fi
+    else
+        echo "✅ pnpm is already available: $(pnpm --version)"
+    fi
+fi
+
+echo ""
+
 # Check if there are old Homebrew node installations
 if brew list 2>/dev/null | grep -qE '^node(@[0-9]+)?$'; then
     echo "⚠️  Found Homebrew Node.js installations:"
@@ -84,6 +139,12 @@ echo "      fnm install              # Install version from .node-version"
 echo "      fnm use 20               # Switch to Node.js 20"
 echo "      fnm default 24           # Set Node.js 24 as default"
 echo "      fnm install --lts        # Install latest LTS"
+echo ""
+echo "   Package Managers:"
+echo "      npm install <package>    # Install with npm"
+echo "      yarn add <package>       # Install with Yarn"
+echo "      pnpm add <package>       # Install with pnpm"
+echo "      corepack enable          # Enable Yarn/pnpm via Corepack"
 echo ""
 echo "💡 Tip: Create .node-version file in your project to auto-switch versions"
 echo "   Example: echo \"20\" > .node-version"
