@@ -2,6 +2,9 @@
 # 这些配置可以安全地提交到 git
 # 由 .zshenv 加载，适用于所有 shell（交互式和非交互式）
 
+# Dotfiles bin directory (自定义命令)
+export PATH="$HOME/dotfiles/bin:$PATH"
+
 # Java
 export JAVA_HOME=/Users/cloud/Library/Java/JavaVirtualMachines/temurin-17.0.15/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH

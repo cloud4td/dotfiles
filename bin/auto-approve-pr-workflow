@@ -1,0 +1,119 @@
+#!/bin/zsh
+
+# Auto Approve PR Workflow
+# Usage: auto-approve-pr <PR_URL>
+
+if [ -z "$1" ]; then
+  echo "Usage: auto-approve-pr <PR_URL>"
+  echo "Example: auto-approve-pr https://github.com/Talkdesk/pm-monorepo/pull/49"
+  exit 1
+fi
+
+PR_URL="$1"
+
+echo "🚀 Triggering auto-approve workflow for: $PR_URL"
+
+# Trigger the workflow
+gh workflow run auto-approve-pr.yaml \
+  --repo Talkdesk/wem-common-workflows \
+  -f pr_url="$PR_URL"
+
+[ $? -ne 0 ] && exit 1
+
+echo "✅ Workflow triggered!"
+echo "⏳ Waiting for run to start..."
+sleep 5
+
+# Get the latest run ID
+RUN_ID=$(gh run list \
+  --workflow="auto-approve-pr.yaml" \
+  --repo Talkdesk/wem-common-workflows \
+  --limit 1 \
+  --json databaseId \
+  --jq '.[0].databaseId')
+
+[ -z "$RUN_ID" ] && echo "❌ Could not find workflow run" && exit 1
+
+echo "📋 Run ID: $RUN_ID"
+echo "⏳ Waiting for manual-gate..."
+
+# Wait for the workflow to reach the manual-gate (waiting status)
+MAX_WAIT=60  # Maximum wait time in seconds
+WAITED=0
+while true; do
+  # Get run status using gh run view
+  STATUS=$(gh run view $RUN_ID \
+    --repo Talkdesk/wem-common-workflows \
+    --json status \
+    --jq '.status' 2>/dev/null)
+  
+  # Check if workflow is waiting for review
+  if [ "$STATUS" = "waiting" ]; then
+    echo "✓ Workflow reached manual-gate"
+    break
+  fi
+  
+  if [ "$STATUS" = "completed" ]; then
+    echo "✅ Workflow already completed"
+    exit 0
+  fi
+  
+  if [ $WAITED -ge $MAX_WAIT ]; then
+    echo "⚠️  Timeout waiting for manual-gate. Current status: $STATUS"
+    echo "🔗 Run URL: https://github.com/Talkdesk/wem-common-workflows/actions/runs/$RUN_ID"
+    exit 1
+  fi
+  
+  echo "   Status: $STATUS (waited ${WAITED}s)"
+  sleep 3
+  WAITED=$((WAITED + 3))
+done
+
+echo "✍️  Approving workflow..."
+
+# Get pending deployments with environment details
+PENDING_JSON=$(gh api \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "/repos/Talkdesk/wem-common-workflows/actions/runs/$RUN_ID/pending_deployments")
+
+# Find the pr-review environment (this is the manual-gate)
+PR_REVIEW_ENV=$(echo "$PENDING_JSON" | jq -r '.[] | select(.environment.name == "pr-review") | .environment.id')
+
+if [ -z "$PR_REVIEW_ENV" ]; then
+  echo "⚠️  Could not find pr-review environment"
+  echo "Available environments:"
+  echo "$PENDING_JSON" | jq -r '.[].environment.name'
+  echo ""
+  echo "🔗 Run URL: https://github.com/Talkdesk/wem-common-workflows/actions/runs/$RUN_ID"
+  exit 1
+fi
+
+echo "   Found pr-review environment: $PR_REVIEW_ENV"
+
+# Approve the pr-review environment
+# Note: environment_ids must be passed as an array of integers, not strings
+APPROVE_RESULT=$(gh api \
+  --method POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "/repos/Talkdesk/wem-common-workflows/actions/runs/$RUN_ID/pending_deployments" \
+  --input - <<EOF 2>&1
+{
+  "environment_ids": [$PR_REVIEW_ENV],
+  "state": "approved",
+  "comment": "Auto-approved via auto-approve-pr-workflow"
+}
+EOF
+)
+
+if [ $? -eq 0 ]; then
+  echo "✅ Approved pr-review environment!"
+  echo "🔗 Watch: gh run watch $RUN_ID --repo Talkdesk/wem-common-workflows"
+else
+  echo "❌ Failed to approve:"
+  echo "$APPROVE_RESULT"
+  echo ""
+  echo "🔗 Run URL: https://github.com/Talkdesk/wem-common-workflows/actions/runs/$RUN_ID"
+  exit 1
+fi

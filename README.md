@@ -8,11 +8,14 @@ macOS 和 devcontainer 的个人配置文件管理仓库。
 dotfiles/
 ├── .devcontainer/          # VS Code devcontainer 配置
 │   └── devcontainer.json
+├── bin/                    # 自定义可执行命令
+│   └── auto-approve-pr    # 示例：自动批准 PR
 ├── zsh/                    # Zsh 配置
 │   ├── .zshenv            # 环境变量配置（所有 shell 都加载）
 │   ├── .zshrc             # 交互式 shell 配置（Oh My Zsh、别名等）
 │   ├── env.zsh            # 公开环境变量（提交到 git）
 │   ├── aliases.zsh        # 别名定义（提交到 git）
+│   ├── functions.zsh      # 自定义命令和函数（提交到 git）
 │   ├── warp.zsh           # Warp 终端特定配置（提交到 git）
 │   ├── secrets.zsh        # 敏感信息（不提交，已在 .gitignore）
 │   └── secrets.zsh.example # 敏感信息模板
@@ -31,6 +34,21 @@ dotfiles/
 - **`.zshrc`** - 仅在交互式 shell 时加载
   - 适合：Oh My Zsh、别名、提示符、插件
   - 加载顺序：在 .zshenv 之后
+
+- **`env.zsh`** - 公开的环境变量
+  - Java、Python、Docker 路径配置等
+
+- **`aliases.zsh`** - 命令别名
+- **`functions.zsh`** - 自定义命令和函数
+  - 复杂的自定义命令、shell 函数
+  - 可以包含逻辑和参数处理
+
+- **`bin/`** - 独立的可执行命令脚本
+  - 独立的命令行工具（如 `auto-approve-pr`）
+  - 已添加到 PATH，可以直接在终端执行
+  - 每个命令是单独的文件，便于管理和版本控制zsh`** - 自定义命令和函数
+  - 复杂的自定义命令、shell 函数
+  - 可以包含逻辑和参数处理
 
 ## 🔐 安全设计
 
