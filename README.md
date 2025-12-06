@@ -1,6 +1,6 @@
 # Dotfiles
 
-Personal configuration file management repository for macOS and devcontainer.
+Personal configuration file management repository for macOS, devcontainer, and GitHub Codespaces.
 
 ## 📁 Directory Structure
 
@@ -89,24 +89,25 @@ vim zsh/secrets.zsh  # Fill in real tokens
 ./scripts/install.sh
 ```
 
-#### Option 3: Using in devcontainer 🐳
+#### Option 3: Using in devcontainer or GitHub Codespaces 🐳
 
-In VS Code devcontainer, sensitive information is passed via **environment variables**:
+In VS Code devcontainer or GitHub Codespaces, sensitive information is passed via **environment variables**:
 
-**Option A - Local Environment Variables** (Simplest)
+**Option A - Local Environment Variables** (For devcontainer)
 ```bash
-# Your tokens are already in ~/.zshrc
+# Your tokens are already in ~/.zshrc on your host machine
 # devcontainer will automatically read these environment variables from host
 # No additional action needed!
 ```
 
-**Option B - GitHub Codespaces Secrets**
+**Option B - GitHub Codespaces Secrets** (For Codespaces)
 1. Go to GitHub repository → Settings
 2. Secrets and variables → Codespaces
 3. Add required secrets:
    - `COPILOT_MCP_FIGMA_API_TOKEN`
    - `SNYK_TOKEN`
    - etc...
+4. These secrets will be automatically available as environment variables in your Codespace
 
 ## 🚀 Quick Start
 
