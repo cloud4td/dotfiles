@@ -10,6 +10,11 @@ dotfiles/
 │   └── devcontainer.json
 ├── bin/                    # Custom executable commands
 │   └── auto-approve-pr    # Example: Auto-approve PR
+├── vscode/                # VS Code configuration
+│   ├── settings.json      # Editor settings
+│   ├── keybindings.json   # Custom keybindings
+│   ├── extensions.txt     # Extension list
+│   └── snippets.code-snippets # Global code snippets
 ├── zsh/                    # Zsh configuration
 │   ├── .zshenv            # Environment variables (loaded by all shells)
 │   ├── .zshrc             # Interactive shell config (Oh My Zsh, aliases, etc.)
@@ -21,6 +26,8 @@ dotfiles/
 │   └── secrets.zsh.example # Sensitive information template
 ├── scripts/               # Installation and configuration scripts
 │   ├── install.sh         # Main installation script
+│   ├── setup-vscode.sh    # VS Code configuration setup
+│   ├── setup-tools.sh     # Common CLI tools installation
 │   ├── setup-fnm.sh       # Node.js version manager setup
 │   ├── setup-python.sh    # Python environment setup (uv + Poetry)
 │   ├── setup-sdkman.sh    # Java/JVM tools manager setup

@@ -1,0 +1,89 @@
+{
+  // JavaScript/TypeScript Snippets
+  "Console Log": {
+    "scope": "javascript,typescript,javascriptreact,typescriptreact",
+    "prefix": "cl",
+    "body": [
+      "console.log('$1:', $1);$0"
+    ],
+    "description": "Console log with label"
+  },
+  "Console Error": {
+    "scope": "javascript,typescript,javascriptreact,typescriptreact",
+    "prefix": "ce",
+    "body": [
+      "console.error('$1:', $1);$0"
+    ],
+    "description": "Console error with label"
+  },
+  "Arrow Function": {
+    "scope": "javascript,typescript,javascriptreact,typescriptreact",
+    "prefix": "af",
+    "body": [
+      "const $1 = ($2) => {",
+      "  $0",
+      "};"
+    ],
+    "description": "Arrow function"
+  },
+  "Async Arrow Function": {
+    "scope": "javascript,typescript,javascriptreact,typescriptreact",
+    "prefix": "aaf",
+    "body": [
+      "const $1 = async ($2) => {",
+      "  $0",
+      "};"
+    ],
+    "description": "Async arrow function"
+  },
+  "Try Catch": {
+    "scope": "javascript,typescript,javascriptreact,typescriptreact",
+    "prefix": "tryc",
+    "body": [
+      "try {",
+      "  $1",
+      "} catch (error) {",
+      "  console.error('$2:', error);$0",
+      "}"
+    ],
+    "description": "Try catch block"
+  },
+
+  // Python Snippets
+  "Python Main": {
+    "scope": "python",
+    "prefix": "main",
+    "body": [
+      "def main():",
+      "    $0",
+      "",
+      "",
+      "if __name__ == '__main__':",
+      "    main()"
+    ],
+    "description": "Python main function"
+  },
+  "Python Class": {
+    "scope": "python",
+    "prefix": "class",
+    "body": [
+      "class $1:",
+      "    \"\"\"$2\"\"\"",
+      "",
+      "    def __init__(self, $3):",
+      "        $0"
+    ],
+    "description": "Python class with docstring"
+  },
+  "Python Try Except": {
+    "scope": "python",
+    "prefix": "try",
+    "body": [
+      "try:",
+      "    $1",
+      "except $2 as e:",
+      "    $0"
+    ],
+    "description": "Try except block"
+  }
+}
