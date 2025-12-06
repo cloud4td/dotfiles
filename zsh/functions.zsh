@@ -1,19 +1,19 @@
 # Custom Commands and Functions
-# 这些自定义命令可以安全地提交到 git
+# These custom commands can be safely committed to git
 
-# 示例：快速跳转到常用目录
+# Example: Quick jump to common directory
 # function work() {
 #     cd ~/work/talkdesk/code
 # }
 
-# 示例：快速查找进程
+# Example: Quick process search
 # function findproc() {
 #     ps aux | grep -i "$1"
 # }
 
-# 示例：创建目录并进入
+# Example: Create directory and enter
 # function mkcd() {
 #     mkdir -p "$1" && cd "$1"
 # }
 
-# 在这里添加你的自定义命令和函数
+# Add your custom commands and functions here

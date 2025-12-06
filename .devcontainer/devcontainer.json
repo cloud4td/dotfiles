@@ -2,15 +2,15 @@
   "name": "Dev Container",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   
-  // 从 host 挂载 dotfiles
+  // Mount dotfiles from host
   "mounts": [
     "source=${localEnv:HOME}/work/talkdesk/code/dotfiles,target=/home/vscode/dotfiles,type=bind,consistency=cached"
   ],
   
-  // 容器启动后运行的命令
+  // Command to run after container creation
   "postCreateCommand": "bash /home/vscode/dotfiles/scripts/install.sh",
   
-  // 从 GitHub Secrets 或环境变量传递敏感信息
+  // Pass sensitive information from GitHub Secrets or environment variables
   "remoteEnv": {
     "COPILOT_MCP_FIGMA_API_TOKEN": "${localEnv:COPILOT_MCP_FIGMA_API_TOKEN}",
     "SNYK_TOKEN": "${localEnv:SNYK_TOKEN}",
@@ -21,7 +21,7 @@
     "COM_TD_WFM_DIALOGFLOW_CREDENTIALS": "${localEnv:COM_TD_WFM_DIALOGFLOW_CREDENTIALS}"
   },
   
-  // 自定义功能
+  // Custom features
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
       "installZsh": true,

@@ -1,6 +1,6 @@
 # Zsh Environment Variables
-# 这个文件在每次启动 zsh 时都会加载（包括非交互式 shell）
-# 适合放环境变量、PATH 等
+# This file is loaded every time zsh starts (including non-interactive shells)
+# Suitable for environment variables, PATH, etc.
 
 # Load custom configurations
 DOTFILES_DIR="$HOME/dotfiles"

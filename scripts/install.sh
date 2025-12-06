@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Dotfiles installation script
-# 用于在新机器或 devcontainer 中安装配置
+# For installing configuration on new machines or devcontainer
 
 set -e
 
@@ -8,7 +8,7 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "Installing dotfiles from $DOTFILES_DIR..."
 
-# 备份现有配置
+# Backup existing configuration
 backup_if_exists() {
     if [ -f "$1" ] || [ -L "$1" ]; then
         echo "Backing up existing $1 to $1.backup"
@@ -16,7 +16,7 @@ backup_if_exists() {
     fi
 }
 
-# 创建符号链接
+# Create symbolic link
 create_symlink() {
     local source="$1"
     local target="$2"
@@ -27,13 +27,13 @@ create_symlink() {
     ln -sf "$source" "$target"
 }
 
-# 安装 zsh 配置
+# Install zsh configuration
 echo ""
 echo "Setting up zsh configuration..."
 create_symlink "$DOTFILES_DIR/zsh/.zshenv" "$HOME/.zshenv"
 create_symlink "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
 
-# 检查是否需要安装 Oh My Zsh
+# Check if Oh My Zsh needs to be installed
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     echo ""
     read -p "Oh My Zsh not found. Install it? (y/N) " -n 1 -r
@@ -43,7 +43,7 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
     fi
 fi
 
-# 创建 dotfiles 符号链接到 HOME
+# Create dotfiles symlink to HOME
 if [ ! -L "$HOME/dotfiles" ] && [ "$DOTFILES_DIR" != "$HOME/dotfiles" ]; then
     echo ""
     echo "Creating symlink: ~/dotfiles -> $DOTFILES_DIR"
