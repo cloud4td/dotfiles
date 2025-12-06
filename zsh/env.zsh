@@ -9,6 +9,9 @@ export PATH="$HOME/dotfiles/bin:$PATH"
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
+# Node.js (fnm - Fast Node Manager)
+eval "$(fnm env --use-on-cd)"
+
 # Docker
 export PATH="$PATH:$HOME/.docker/bin"
 export PATH="/usr/local/sbin:$PATH"
