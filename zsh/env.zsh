@@ -20,7 +20,11 @@ export PATH="$HOME/.local/bin:$PATH"
 # uv - Fast Python package and project manager (installed via Homebrew)
 # Both Poetry and uv can coexist - use Poetry for existing projects, uv for new ones
 
-# Docker
+# Podman (Docker replacement with compatibility mode)
+# Docker socket is provided by Podman machine
+export DOCKER_HOST="unix:///var/run/docker.sock"
+
+# Legacy Docker paths (kept for compatibility)
 export PATH="$PATH:$HOME/.docker/bin"
 export PATH="/usr/local/sbin:$PATH"
 

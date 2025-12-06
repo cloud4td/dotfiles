@@ -20,7 +20,12 @@ dotfiles/
 │   ├── secrets.zsh        # Sensitive information (not committed, in .gitignore)
 │   └── secrets.zsh.example # Sensitive information template
 ├── scripts/               # Installation and configuration scripts
-│   └── install.sh         # Main installation script
+│   ├── install.sh         # Main installation script
+│   ├── setup-fnm.sh       # Node.js version manager setup
+│   ├── setup-python.sh    # Python environment setup (uv + Poetry)
+│   ├── setup-sdkman.sh    # Java/JVM tools manager setup
+│   ├── setup-podman.sh    # Podman (Docker replacement) setup
+│   └── setup-zsh-plugins.sh # Zsh plugins installation
 ├── .gitignore
 └── README.md
 ```
@@ -55,8 +60,8 @@ dotfiles/
 This repository uses **separation management**, dividing configurations into two categories:
 
 **✅ Public Configuration** (committed to git)
-- `zsh/env.zsh` - General environment variables (Java, Python, Docker paths, etc.)
-- `zsh/aliases.zsh` - Command aliases
+- `zsh/env.zsh` - General environment variables (Java, Python, Node.js, Podman paths, etc.)
+- `zsh/aliases.zsh` - Command aliases (including Podman Docker compatibility aliases)
 - `zsh/.zshrc` - Main configuration file
 
 **🔒 Sensitive Configuration** (not committed to git)
@@ -167,9 +172,28 @@ source ~/.zshrc
 - 🚨 If accidentally committed, use `git filter-branch` or BFG Repo-Cleaner to clean history
 ## 🛠️ Dependencies
 
+### Core Tools
 - zsh
 - oh-my-zsh (automatically installed by installation script)
 - git
+- Homebrew (macOS package manager)
+
+### Development Tools (installed via setup scripts)
+- **Node.js**: fnm (Fast Node Manager)
+- **Python**: uv + Poetry
+- **Java/JVM**: SDKMAN
+- **Containers**: Podman (Docker replacement with compatibility mode)
+  - docker-compose
+  - podman-compose
+
+### Setup Scripts
+```bash
+# Run individual setup scripts
+./scripts/setup-fnm.sh      # Install Node.js via fnm
+./scripts/setup-python.sh   # Install Python via uv
+./scripts/setup-sdkman.sh   # Install Java via SDKMAN
+./scripts/setup-podman.sh   # Install Podman with Docker compatibility
+```
 
 ## 💡 Terminal Support
 
