@@ -13,9 +13,5 @@ export PATH=$JAVA_HOME/bin:$PATH
 export PATH="$PATH:$HOME/.docker/bin"
 export PATH="/usr/local/sbin:$PATH"
 
-# Python
-export PYTHONPATH=.venv/lib/python3.11/site-packages
-export DYLD_LIBRARY_PATH=.venv/lib/python3.11/site-packages/jep
-
 # Homebrew
 export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.aliyun.com/homebrew/homebrew-bottles
