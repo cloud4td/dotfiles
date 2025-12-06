@@ -1,5 +1,6 @@
 # Public Environment Variables
 # 这些配置可以安全地提交到 git
+# 由 .zshenv 加载，适用于所有 shell（交互式和非交互式）
 
 # Java
 export JAVA_HOME=/Users/cloud/Library/Java/JavaVirtualMachines/temurin-17.0.15/Contents/Home

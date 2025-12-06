@@ -30,6 +30,7 @@ create_symlink() {
 # 安装 zsh 配置
 echo ""
 echo "Setting up zsh configuration..."
+create_symlink "$DOTFILES_DIR/zsh/.zshenv" "$HOME/.zshenv"
 create_symlink "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
 
 # 检查是否需要安装 Oh My Zsh

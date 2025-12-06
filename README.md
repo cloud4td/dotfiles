@@ -9,7 +9,8 @@ dotfiles/
 ├── .devcontainer/          # VS Code devcontainer 配置
 │   └── devcontainer.json
 ├── zsh/                    # Zsh 配置
-│   ├── .zshrc             # 主配置文件
+│   ├── .zshenv            # 环境变量配置（所有 shell 都加载）
+│   ├── .zshrc             # 交互式 shell 配置（Oh My Zsh、别名等）
 │   ├── env.zsh            # 公开环境变量（提交到 git）
 │   ├── aliases.zsh        # 别名定义（提交到 git）
 │   ├── warp.zsh           # Warp 终端特定配置（提交到 git）
@@ -20,6 +21,16 @@ dotfiles/
 ├── .gitignore
 └── README.md
 ```
+
+## 📚 配置文件说明
+
+- **`.zshenv`** - 每次启动 zsh 都会加载（包括非交互式 shell）
+  - 适合：环境变量、PATH、密钥等
+  - 加载顺序：最先加载
+  
+- **`.zshrc`** - 仅在交互式 shell 时加载
+  - 适合：Oh My Zsh、别名、提示符、插件
+  - 加载顺序：在 .zshenv 之后
 
 ## 🔐 安全设计
 
