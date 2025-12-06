@@ -6,8 +6,8 @@
 export PATH="$HOME/dotfiles/bin:$PATH"
 
 # Java
-export JAVA_HOME=/Users/cloud/Library/Java/JavaVirtualMachines/temurin-17.0.15/Contents/Home
-export PATH=$JAVA_HOME/bin:$PATH
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 # Docker
 export PATH="$PATH:$HOME/.docker/bin"
