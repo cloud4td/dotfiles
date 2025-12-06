@@ -12,6 +12,7 @@ dotfiles/
 │   ├── .zshrc             # 主配置文件
 │   ├── env.zsh            # 公开环境变量（提交到 git）
 │   ├── aliases.zsh        # 别名定义（提交到 git）
+│   ├── warp.zsh           # Warp 终端特定配置（提交到 git）
 │   ├── secrets.zsh        # 敏感信息（不提交，已在 .gitignore）
 │   └── secrets.zsh.example # 敏感信息模板
 ├── scripts/               # 安装和配置脚本
@@ -136,11 +137,25 @@ source ~/.zshrc
 - ⚠️ 使用 `git status` 确认没有意外提交敏感文件
 - 🔄 定期轮换你的 tokens
 - 🚨 如果意外提交，使用 `git filter-branch` 或 BFG Repo-Cleaner 清理历史
-
 ## 🛠️ 依赖
 
 - zsh
 - oh-my-zsh（安装脚本会自动安装）
+- git
+
+## 💡 终端支持
+
+本配置支持以下终端：
+- **Warp** - 现代化终端，会自动读取 `.zshrc` 和所有配置
+- **VS Code 集成终端** - 通过 `EDITOR=code` 配置
+- **iTerm2** - 标准 zsh 配置
+- **默认 macOS Terminal** - 标准 zsh 配置
+
+Warp 特别说明：
+- Warp 会自动应用你的 Oh My Zsh 主题和插件
+- Warp 的 AI 功能和自动补全会保持启用
+- 所有环境变量和别名都会正常工作
+- `warp.zsh` 文件可用于添加 Warp 特定的配置my-zsh（安装脚本会自动安装）
 - git
 
 ## 📄 License

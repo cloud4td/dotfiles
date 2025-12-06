@@ -16,6 +16,9 @@ DOTFILES_DIR="$HOME/dotfiles"
 # Load aliases
 [ -f "$DOTFILES_DIR/zsh/aliases.zsh" ] && source "$DOTFILES_DIR/zsh/aliases.zsh"
 
+# Load Warp specific settings
+[ -f "$DOTFILES_DIR/zsh/warp.zsh" ] && source "$DOTFILES_DIR/zsh/warp.zsh"
+
 # Load local secrets (not in git)
 [ -f "$DOTFILES_DIR/zsh/secrets.zsh" ] && source "$DOTFILES_DIR/zsh/secrets.zsh"
 
