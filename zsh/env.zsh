@@ -1,8 +1,8 @@
 # Public Environment Variables
-# 这些配置可以安全地提交到 git
-# 由 .zshenv 加载，适用于所有 shell（交互式和非交互式）
+# These configurations can be safely committed to git
+# Loaded by .zshenv, applies to all shells (interactive and non-interactive)
 
-# Dotfiles bin directory (自定义命令)
+# Dotfiles bin directory (custom commands)
 export PATH="$HOME/dotfiles/bin:$PATH"
 
 # Java

@@ -1,191 +1,188 @@
 # Dotfiles
 
-macOS 和 devcontainer 的个人配置文件管理仓库。
+Personal configuration file management repository for macOS and devcontainer.
 
-## 📁 目录结构
+## 📁 Directory Structure
 
 ```
 dotfiles/
-├── .devcontainer/          # VS Code devcontainer 配置
+├── .devcontainer/          # VS Code devcontainer configuration
 │   └── devcontainer.json
-├── bin/                    # 自定义可执行命令
-│   └── auto-approve-pr    # 示例：自动批准 PR
-├── zsh/                    # Zsh 配置
-│   ├── .zshenv            # 环境变量配置（所有 shell 都加载）
-│   ├── .zshrc             # 交互式 shell 配置（Oh My Zsh、别名等）
-│   ├── env.zsh            # 公开环境变量（提交到 git）
-│   ├── aliases.zsh        # 别名定义（提交到 git）
-│   ├── functions.zsh      # 自定义命令和函数（提交到 git）
-│   ├── warp.zsh           # Warp 终端特定配置（提交到 git）
-│   ├── secrets.zsh        # 敏感信息（不提交，已在 .gitignore）
-│   └── secrets.zsh.example # 敏感信息模板
-├── scripts/               # 安装和配置脚本
-│   └── install.sh         # 主安装脚本
+├── bin/                    # Custom executable commands
+│   └── auto-approve-pr    # Example: Auto-approve PR
+├── zsh/                    # Zsh configuration
+│   ├── .zshenv            # Environment variables (loaded by all shells)
+│   ├── .zshrc             # Interactive shell config (Oh My Zsh, aliases, etc.)
+│   ├── env.zsh            # Public environment variables (committed to git)
+│   ├── aliases.zsh        # Alias definitions (committed to git)
+│   ├── functions.zsh      # Custom commands and functions (committed to git)
+│   ├── warp.zsh           # Warp terminal specific config (committed to git)
+│   ├── secrets.zsh        # Sensitive information (not committed, in .gitignore)
+│   └── secrets.zsh.example # Sensitive information template
+├── scripts/               # Installation and configuration scripts
+│   └── install.sh         # Main installation script
 ├── .gitignore
 └── README.md
 ```
 
-## 📚 配置文件说明
+## 📚 Configuration Files Description
 
-- **`.zshenv`** - 每次启动 zsh 都会加载（包括非交互式 shell）
-  - 适合：环境变量、PATH、密钥等
-  - 加载顺序：最先加载
+- **`.zshenv`** - Loaded every time zsh starts (including non-interactive shells)
+  - Suitable for: environment variables, PATH, credentials, etc.
+  - Load order: loaded first
   
-- **`.zshrc`** - 仅在交互式 shell 时加载
-  - 适合：Oh My Zsh、别名、提示符、插件
-  - 加载顺序：在 .zshenv 之后
+- **`.zshrc`** - Loaded only for interactive shells
+  - Suitable for: Oh My Zsh, aliases, prompts, plugins
+  - Load order: after .zshenv
 
-- **`env.zsh`** - 公开的环境变量
-  - Java、Python、Docker 路径配置等
+- **`env.zsh`** - Public environment variables
+  - Java, Python, Docker path configurations, etc.
 
-- **`aliases.zsh`** - 命令别名
-- **`functions.zsh`** - 自定义命令和函数
-  - 复杂的自定义命令、shell 函数
-  - 可以包含逻辑和参数处理
+- **`aliases.zsh`** - Command aliases
+- **`functions.zsh`** - Custom commands and functions
+  - Complex custom commands, shell functions
+  - Can include logic and parameter handling
 
-- **`bin/`** - 独立的可执行命令脚本
-  - 独立的命令行工具（如 `auto-approve-pr`）
-  - 已添加到 PATH，可以直接在终端执行
-  - 每个命令是单独的文件，便于管理和版本控制zsh`** - 自定义命令和函数
-  - 复杂的自定义命令、shell 函数
-  - 可以包含逻辑和参数处理
+- **`bin/`** - Standalone executable command scripts
+  - Independent command-line tools (e.g., `auto-approve-pr`)
+  - Added to PATH, can be executed directly in terminal
+  - Each command is a separate file, easy to manage and version control
 
-## 🔐 安全设计
+## 🔐 Security Design
 
-### 敏感信息管理策略
+### Sensitive Information Management Strategy
 
-本仓库采用**分离式管理**，将配置分为两类：
+This repository uses **separation management**, dividing configurations into two categories:
 
-**✅ 公开配置**（提交到 git）
-- `zsh/env.zsh` - 通用环境变量（Java、Python、Docker 路径等）
-- `zsh/aliases.zsh` - 命令别名
-- `zsh/.zshrc` - 主配置文件
+**✅ Public Configuration** (committed to git)
+- `zsh/env.zsh` - General environment variables (Java, Python, Docker paths, etc.)
+- `zsh/aliases.zsh` - Command aliases
+- `zsh/.zshrc` - Main configuration file
 
-**🔒 敏感配置**（不提交到 git）
-- `zsh/secrets.zsh` - 包含所有 tokens、credentials
-- 已在 `.gitignore` 中排除，永远不会提交
+**🔒 Sensitive Configuration** (not committed to git)
+- `zsh/secrets.zsh` - Contains all tokens, credentials
+- Excluded in `.gitignore`, will never be committed
 
-### Token 管理的三种方式
+### Three Ways to Manage Tokens
 
-#### 方式 1：本地开发（推荐）✨
+#### Option 1: Local Development (Recommended) ✨
 ```bash
-# secrets.zsh 已经包含了你当前的 tokens
-# 它在 .gitignore 中，不会被提交到 git
+# secrets.zsh already contains your current tokens
+# It's in .gitignore and won't be committed to git
 
-# 查看 git 状态确认
+# Verify git status
 cd ~/work/talkdesk/code/dotfiles
-git status  # 应该看不到 secrets.zsh
+git status  # should not see secrets.zsh
 ```
 
-#### 方式 2：新机器迁移
+#### Option 2: New Machine Migration
 ```bash
-# 在新机器上
+# On new machine
 git clone https://github.com/cloud4td/dotfiles.git ~/work/talkdesk/code/dotfiles
 cd ~/work/talkdesk/code/dotfiles
 
-# 手动创建 secrets.zsh（从模板或手动输入）
+# Manually create secrets.zsh (from template or manual input)
 cp zsh/secrets.zsh.example zsh/secrets.zsh
-vim zsh/secrets.zsh  # 填入真实的 tokens
+vim zsh/secrets.zsh  # Fill in real tokens
 
-# 运行安装
+# Run installation
 ./scripts/install.sh
 ```
 
-#### 方式 3：devcontainer 中使用 🐳
+#### Option 3: Using in devcontainer 🐳
 
-在 VS Code devcontainer 中，敏感信息通过**环境变量**传递：
+In VS Code devcontainer, sensitive information is passed via **environment variables**:
 
-**选项 A - 本地环境变量**（最简单）
+**Option A - Local Environment Variables** (Simplest)
 ```bash
-# 你的 tokens 已经在 ~/.zshrc 中
-# devcontainer 会自动从 host 读取这些环境变量
-# 不需要额外操作！
+# Your tokens are already in ~/.zshrc
+# devcontainer will automatically read these environment variables from host
+# No additional action needed!
 ```
 
-**选项 B - GitHub Codespaces Secrets**
-1. 进入 GitHub repository → Settings
+**Option B - GitHub Codespaces Secrets**
+1. Go to GitHub repository → Settings
 2. Secrets and variables → Codespaces
-3. 添加所需的 secrets：
+3. Add required secrets:
    - `COPILOT_MCP_FIGMA_API_TOKEN`
    - `SNYK_TOKEN`
-   - 等等...
+   - etc...
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 在当前机器应用配置
+### Apply Configuration on Current Machine
 
 ```bash
-# 1. 备份当前配置（已自动完成）
-# 2. 运行安装脚本
+# 1. Backup current configuration (automatically done)
+# 2. Run installation script
 cd ~/work/talkdesk/code/dotfiles
 chmod +x scripts/install.sh
 ./scripts/install.sh
 
-# 3. 重新加载配置
+# 3. Reload configuration
 source ~/.zshrc
 
-# 4. 验证
-echo $SNYK_TOKEN  # 应该输出你的 token
+# 4. Verify
+echo $SNYK_TOKEN  # should output your token
 ```
 
-### 提交到 Git
+### Commit to Git
 
 ```bash
 cd ~/work/talkdesk/code/dotfiles
 
-# 查看将要提交的文件
+# Check files to be committed
 git status
 
-# 确认 secrets.zsh 不在列表中！
+# Confirm secrets.zsh is not in the list!
 git add .
 git commit -m "Add dotfiles configuration"
 git push
 ```
 
-## 📝 更新配置
+## 📝 Update Configuration
 
 ```bash
-# 修改公开配置
+# Modify public configuration
 vim ~/dotfiles/zsh/env.zsh
 
-# 提交到 git
+# Commit to git
 cd ~/dotfiles
 git add zsh/env.zsh
 git commit -m "Update environment config"
 git push
 
-# 其他机器拉取更新
+# Pull updates on other machines
 git pull
 source ~/.zshrc
 ```
 
-## ⚠️ 安全提醒
+## ⚠️ Security Reminder
 
-- ✅ `secrets.zsh` 已经创建并包含你的真实 tokens
-- ✅ `secrets.zsh` 已在 `.gitignore` 中，不会被提交
-- ⚠️ 使用 `git status` 确认没有意外提交敏感文件
-- 🔄 定期轮换你的 tokens
-- 🚨 如果意外提交，使用 `git filter-branch` 或 BFG Repo-Cleaner 清理历史
-## 🛠️ 依赖
+- ✅ `secrets.zsh` is created and contains your real tokens
+- ✅ `secrets.zsh` is in `.gitignore` and won't be committed
+- ⚠️ Use `git status` to confirm no accidental commits of sensitive files
+- 🔄 Regularly rotate your tokens
+- 🚨 If accidentally committed, use `git filter-branch` or BFG Repo-Cleaner to clean history
+## 🛠️ Dependencies
 
 - zsh
-- oh-my-zsh（安装脚本会自动安装）
+- oh-my-zsh (automatically installed by installation script)
 - git
 
-## 💡 终端支持
+## 💡 Terminal Support
 
-本配置支持以下终端：
-- **Warp** - 现代化终端，会自动读取 `.zshrc` 和所有配置
-- **VS Code 集成终端** - 通过 `EDITOR=code` 配置
-- **iTerm2** - 标准 zsh 配置
-- **默认 macOS Terminal** - 标准 zsh 配置
+This configuration supports the following terminals:
+- **Warp** - Modern terminal, automatically reads `.zshrc` and all configurations
+- **VS Code Integrated Terminal** - Configured via `EDITOR=code`
+- **iTerm2** - Standard zsh configuration
+- **Default macOS Terminal** - Standard zsh configuration
 
-Warp 特别说明：
-- Warp 会自动应用你的 Oh My Zsh 主题和插件
-- Warp 的 AI 功能和自动补全会保持启用
-- 所有环境变量和别名都会正常工作
-- `warp.zsh` 文件可用于添加 Warp 特定的配置my-zsh（安装脚本会自动安装）
-- git
+Warp specific notes:
+- Warp automatically applies your Oh My Zsh themes and plugins
+- Warp's AI features and auto-completion remain enabled
+- All environment variables and aliases work normally
+- `warp.zsh` file can be used to add Warp-specific configurations
 
 ## 📄 License
 
