@@ -33,44 +33,48 @@ if ! command -v sdk &> /dev/null; then
 fi
 
 echo ""
-echo "📋 Checking current Java installation..."
+echo "📋 Checking SDKs from .sdkmanrc..."
 
-# Check if Java 17 (Temurin) is already installed via SDKMAN
-JAVA_VERSION="17.0.17-tem"
-INSTALLED_JAVA=$(sdk list java | grep "installed" | grep "$JAVA_VERSION" || true)
+# Determine SDKs from .sdkmanrc file
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-if [ -n "$INSTALLED_JAVA" ]; then
-    echo "✅ Java $JAVA_VERSION is already installed"
-else
-    echo "📦 Installing Java $JAVA_VERSION..."
-    sdk install java "$JAVA_VERSION"
+if [ -f "$DOTFILES_DIR/.sdkmanrc" ]; then
+    # Display SDKs to be installed
+    echo "📋 SDKs from .sdkmanrc:"
+    grep "^[a-z].*=" "$DOTFILES_DIR/.sdkmanrc" | while read -r line; do
+        [ -n "$line" ] && echo "   - $line"
+    done
     
-    if [ $? -eq 0 ]; then
-        echo "✅ Java $JAVA_VERSION installed successfully!"
-    else
-        echo "❌ Failed to install Java $JAVA_VERSION"
-        echo "💡 Tip: Run 'sdk list java' to see available versions"
-        exit 1
-    fi
+    # Install SDKs via SDKMAN using sdk env install
+    echo ""
+    echo "📦 Installing SDKs via SDKMAN..."
+    cd "$DOTFILES_DIR"
+    sdk env install
+    
+    echo ""
+    echo "✅ All SDKs installed and configured"
+else
+    echo "⚠️  No .sdkmanrc file found, skipping SDK installation"
+    echo "💡 Create .sdkmanrc file with: sdk env init"
+    exit 0
 fi
-
-# Set as default
-echo ""
-echo "🔧 Setting Java $JAVA_VERSION as default..."
-sdk default java "$JAVA_VERSION"
 
 echo ""
 echo "✅ SDKMAN setup complete!"
 echo ""
-echo "📊 Current Java version:"
-java -version
+echo "📊 Current SDK configuration:"
+echo "Java:   $(java -version 2>&1 | head -n 1)"
+echo "Maven:  $(mvn -version 2>&1 | head -n 1)"
+echo "Gradle: $(gradle -version 2>&1 | grep "Gradle" | head -n 1)"
+echo "Kotlin: $(kotlin -version 2>&1)"
+echo "Scala:  $(scala -version 2>&1)"
 echo ""
-echo "📍 JAVA_HOME: $JAVA_HOME"
+echo "📚 Quick Reference:"
 echo ""
-echo "💡 Useful SDKMAN commands:"
-echo "  sdk list java              - List available Java versions"
-echo "  sdk install java <version> - Install a specific version"
-echo "  sdk use java <version>     - Use version for current shell"
-echo "  sdk default java <version> - Set as global default"
-echo "  sdk current java           - Show current version"
-echo "  sdk upgrade java           - Upgrade to latest version"
+echo "   SDK Version Management:"
+echo "      sdk list java              # List available versions"
+echo "      sdk install java 21-tem    # Install Java 21"
+echo "      sdk env install            # Install all SDKs from .sdkmanrc"
+echo "      sdk current                # Show all current versions"
+echo ""
+
