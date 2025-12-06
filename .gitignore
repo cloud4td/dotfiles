@@ -1,0 +1,11 @@
+# Sensitive files - do not commit to git
+.env.local
+.secrets
+secrets.zsh
+
+# macOS
+.DS_Store
+
+# Backup files
+*.bak
+*~

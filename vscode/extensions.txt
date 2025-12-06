@@ -1,0 +1,43 @@
+# Essential Extensions
+github.copilot
+github.copilot-chat
+eamodio.gitlens
+ms-vscode.remote-ssh
+
+# Language Support - JavaScript/TypeScript
+dbaeumer.vscode-eslint
+esbenp.prettier-vscode
+bradlc.vscode-tailwindcss
+
+# Language Support - Python
+ms-python.python
+ms-python.vscode-pylance
+charliermarsh.ruff
+
+# Language Support - Other
+redhat.vscode-yaml
+tamasfe.even-better-toml
+
+# Docker/Kubernetes
+ms-azuretools.vscode-docker
+ms-kubernetes-tools.vscode-kubernetes-tools
+
+# Themes & Icons
+pkief.material-icon-theme
+github.github-vscode-theme
+
+# Productivity
+usernamehw.errorlens
+christian-kohler.path-intellisense
+gruntfuggly.todo-tree
+streetsidesoftware.code-spell-checker
+wayou.vscode-todo-highlight
+
+# Markdown
+yzhang.markdown-all-in-one
+bierner.markdown-mermaid
+
+# Utilities
+editorconfig.editorconfig
+foxundermoon.shell-format
+shardulm94.trailing-spaces

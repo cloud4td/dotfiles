@@ -1,0 +1,243 @@
+#!/bin/zsh
+
+# Generic GitHub Action Runner with Auto-Approval
+# Usage: gh-run-approve --repo <REPO> --workflow <WORKFLOW> [--input KEY=VALUE] [--environment ENV_NAME]
+# Example: gh-run-approve --repo Talkdesk/wem-common-workflows --workflow auto-approve-pr.yaml --input pr_url=https://github.com/Talkdesk/pm-monorepo/pull/49 --environment pr-review
+
+# Parse arguments
+REPO=""
+WORKFLOW=""
+ENV_NAME=""
+declare -A INPUTS
+
+print_usage() {
+  cat << EOF
+Usage: gh-run-approve --repo <REPO> --workflow <WORKFLOW> [OPTIONS]
+
+Required:
+  --repo <REPO>           Repository in format owner/repo
+  --workflow <WORKFLOW>   Workflow file name (e.g., deploy.yaml)
+
+Optional:
+  --input <KEY=VALUE>     Workflow input (can be specified multiple times)
+  --environment <ENV>     Environment name to auto-approve (e.g., pr-review, production)
+  --branch <BRANCH>       Branch to run workflow on (default: repo's default branch)
+  --wait-timeout <SEC>    Maximum seconds to wait for approval gate (default: 120)
+
+Examples:
+  # Run workflow with auto-approval of pr-review environment
+  gh-run-approve --repo Talkdesk/wem-common-workflows \\
+    --workflow auto-approve-pr.yaml \\
+    --input pr_url=https://github.com/Talkdesk/pm-monorepo/pull/49 \\
+    --environment pr-review
+
+  # Run workflow without auto-approval
+  gh-run-approve --repo myorg/myrepo \\
+    --workflow deploy.yaml \\
+    --input version=1.2.3
+
+  # Run on specific branch with multiple inputs
+  gh-run-approve --repo myorg/myrepo \\
+    --workflow deploy.yaml \\
+    --branch develop \\
+    --input env=staging \\
+    --input version=1.2.3 \\
+    --environment staging
+EOF
+}
+
+# Parse command line arguments
+BRANCH=""
+WAIT_TIMEOUT=120
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --repo)
+      REPO="$2"
+      shift 2
+      ;;
+    --workflow)
+      WORKFLOW="$2"
+      shift 2
+      ;;
+    --input)
+      if [[ "$2" =~ ^([^=]+)=(.*)$ ]]; then
+        INPUTS[${match[1]}]="${match[2]}"
+      else
+        echo "❌ Invalid input format: $2 (expected KEY=VALUE)"
+        exit 1
+      fi
+      shift 2
+      ;;
+    --environment)
+      ENV_NAME="$2"
+      shift 2
+      ;;
+    --branch)
+      BRANCH="$2"
+      shift 2
+      ;;
+    --wait-timeout)
+      WAIT_TIMEOUT="$2"
+      shift 2
+      ;;
+    --help|-h)
+      print_usage
+      exit 0
+      ;;
+    *)
+      echo "❌ Unknown option: $1"
+      print_usage
+      exit 1
+      ;;
+  esac
+done
+
+# Validate required arguments
+if [ -z "$REPO" ] || [ -z "$WORKFLOW" ]; then
+  echo "❌ Missing required arguments"
+  print_usage
+  exit 1
+fi
+
+# Build workflow trigger command
+TRIGGER_CMD="gh workflow run $WORKFLOW --repo $REPO"
+
+if [ -n "$BRANCH" ]; then
+  TRIGGER_CMD="$TRIGGER_CMD --ref $BRANCH"
+fi
+
+for key val in ${(kv)INPUTS}; do
+  TRIGGER_CMD="$TRIGGER_CMD -f $key=$val"
+done
+
+# Trigger the workflow
+echo "🚀 Triggering workflow: $WORKFLOW in $REPO"
+[ ${#INPUTS[@]} -gt 0 ] && echo "📝 Inputs:" && for key val in ${(kv)INPUTS}; do echo "   $key=$val"; done
+
+eval $TRIGGER_CMD
+
+if [ $? -ne 0 ]; then
+  echo "❌ Failed to trigger workflow"
+  exit 1
+fi
+
+echo "✅ Workflow triggered!"
+echo "⏳ Waiting for run to start..."
+sleep 5
+
+# Get the latest run ID
+RUN_ID=$(gh run list \
+  --workflow="$WORKFLOW" \
+  --repo "$REPO" \
+  --limit 1 \
+  --json databaseId \
+  --jq '.[0].databaseId')
+
+if [ -z "$RUN_ID" ]; then
+  echo "❌ Could not find workflow run"
+  exit 1
+fi
+
+echo "📋 Run ID: $RUN_ID"
+echo "🔗 Run URL: https://github.com/$REPO/actions/runs/$RUN_ID"
+
+# If no environment specified, just monitor the run
+if [ -z "$ENV_NAME" ]; then
+  echo "ℹ️  No environment specified, monitoring workflow..."
+  gh run watch $RUN_ID --repo "$REPO"
+  exit $?
+fi
+
+# Wait for the workflow to reach waiting state (approval gate)
+echo "⏳ Waiting for '$ENV_NAME' environment approval gate..."
+WAITED=0
+
+while true; do
+  # Get run status
+  STATUS=$(gh run view $RUN_ID \
+    --repo "$REPO" \
+    --json status \
+    --jq '.status' 2>/dev/null)
+  
+  # Check if workflow is waiting for review
+  if [ "$STATUS" = "waiting" ]; then
+    echo "✓ Workflow reached approval gate"
+    break
+  fi
+  
+  if [ "$STATUS" = "completed" ]; then
+    CONCLUSION=$(gh run view $RUN_ID \
+      --repo "$REPO" \
+      --json conclusion \
+      --jq '.conclusion')
+    
+    if [ "$CONCLUSION" = "success" ]; then
+      echo "✅ Workflow completed successfully (no approval needed)"
+    else
+      echo "❌ Workflow completed with status: $CONCLUSION"
+    fi
+    exit 0
+  fi
+  
+  if [ $WAITED -ge $WAIT_TIMEOUT ]; then
+    echo "⚠️  Timeout waiting for approval gate. Current status: $STATUS"
+    echo "🔗 Run URL: https://github.com/$REPO/actions/runs/$RUN_ID"
+    echo "💡 Tip: Increase timeout with --wait-timeout <seconds>"
+    exit 1
+  fi
+  
+  echo "   Status: $STATUS (waited ${WAITED}s / ${WAIT_TIMEOUT}s)"
+  sleep 3
+  WAITED=$((WAITED + 3))
+done
+
+echo "✍️  Approving '$ENV_NAME' environment..."
+
+# Get pending deployments
+PENDING_JSON=$(gh api \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "/repos/$REPO/actions/runs/$RUN_ID/pending_deployments")
+
+# Find the specified environment
+ENV_ID=$(echo "$PENDING_JSON" | jq -r ".[] | select(.environment.name == \"$ENV_NAME\") | .environment.id")
+
+if [ -z "$ENV_ID" ]; then
+  echo "⚠️  Could not find environment: $ENV_NAME"
+  echo "Available environments:"
+  echo "$PENDING_JSON" | jq -r '.[].environment.name' | sed 's/^/   - /'
+  echo ""
+  echo "🔗 Run URL: https://github.com/$REPO/actions/runs/$RUN_ID"
+  exit 1
+fi
+
+echo "   Found environment '$ENV_NAME' (ID: $ENV_ID)"
+
+# Approve the environment
+APPROVE_RESULT=$(gh api \
+  --method POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "/repos/$REPO/actions/runs/$RUN_ID/pending_deployments" \
+  --input - <<EOF 2>&1
+{
+  "environment_ids": [$ENV_ID],
+  "state": "approved",
+  "comment": "Auto-approved via gh-run-approve"
+}
+EOF
+)
+
+if [ $? -eq 0 ]; then
+  echo "✅ Approved '$ENV_NAME' environment!"
+  echo "📺 Watching workflow progress..."
+  echo ""
+  gh run watch $RUN_ID --repo "$REPO"
+else
+  echo "❌ Failed to approve:"
+  echo "$APPROVE_RESULT"
+  echo ""
+  echo "🔗 Run URL: https://github.com/$REPO/actions/runs/$RUN_ID"
+  exit 1
+fi

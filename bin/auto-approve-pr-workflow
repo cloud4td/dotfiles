@@ -1,0 +1,22 @@
+#!/bin/zsh
+
+# Auto Approve PR Workflow (Legacy wrapper for gh-run-approve)
+# Usage: auto-approve-pr-workflow <PR_URL>
+
+if [ -z "$1" ]; then
+  echo "Usage: auto-approve-pr-workflow <PR_URL>"
+  echo "Example: auto-approve-pr-workflow https://github.com/Talkdesk/pm-monorepo/pull/49"
+  echo ""
+  echo "💡 Tip: Use 'gh-run-approve' for a more generic GitHub Action runner"
+  exit 1
+fi
+
+PR_URL="$1"
+
+# Use the generic gh-run-approve command
+gh-run-approve \
+  --repo Talkdesk/wem-common-workflows \
+  --workflow auto-approve-pr.yaml \
+  --input pr_url="$PR_URL" \
+  --environment pr-review \
+  --wait-timeout 60
