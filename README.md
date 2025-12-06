@@ -24,6 +24,7 @@ dotfiles/
 │   ├── setup-fnm.sh       # Node.js version manager setup
 │   ├── setup-python.sh    # Python environment setup (uv + Poetry)
 │   ├── setup-sdkman.sh    # Java/JVM tools manager setup
+│   ├── setup-dotnet.sh    # .NET SDK setup
 │   ├── setup-podman.sh    # Podman (Docker replacement) setup
 │   └── setup-zsh-plugins.sh # Zsh plugins installation
 ├── .gitignore
@@ -181,7 +182,8 @@ source ~/.zshrc
 ### Development Tools (installed via setup scripts)
 - **Node.js**: fnm (Fast Node Manager)
 - **Python**: uv + Poetry
-- **Java/JVM**: SDKMAN
+- **Java/JVM**: SDKMAN (manages Java, Maven, Gradle, Kotlin, Scala)
+- **.NET**: .NET SDK (supports multiple versions via global.json)
 - **Containers**: Podman (Docker replacement with compatibility mode)
   - docker-compose
   - podman-compose
@@ -191,7 +193,8 @@ source ~/.zshrc
 # Run individual setup scripts
 ./scripts/setup-fnm.sh      # Install Node.js via fnm
 ./scripts/setup-python.sh   # Install Python via uv
-./scripts/setup-sdkman.sh   # Install Java via SDKMAN
+./scripts/setup-sdkman.sh   # Install Java/JVM via SDKMAN
+./scripts/setup-dotnet.sh   # Install .NET SDK
 ./scripts/setup-podman.sh   # Install Podman with Docker compatibility
 ```
 

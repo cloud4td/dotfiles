@@ -30,3 +30,9 @@ export PATH="/usr/local/sbin:$PATH"
 
 # Homebrew
 export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.aliyun.com/homebrew/homebrew-bottles
+
+# .NET (managed via dotnet-install script, similar to fnm/uv/sdkman)
+export DOTNET_ROOT="$HOME/.dotnet"
+export PATH="$DOTNET_ROOT:$PATH"
+# Disable telemetry for privacy
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
