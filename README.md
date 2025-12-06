@@ -21,6 +21,7 @@ dotfiles/
 │   ├── env.zsh            # Public environment variables (committed to git)
 │   ├── aliases.zsh        # Alias definitions (committed to git)
 │   ├── functions.zsh      # Custom commands and functions (committed to git)
+│   ├── prompt.zsh         # Custom prompt configuration (committed to git)
 │   ├── warp.zsh           # Warp terminal specific config (committed to git)
 │   ├── secrets.zsh        # Sensitive information (not committed, in .gitignore)
 │   └── secrets.zsh.example # Sensitive information template
@@ -41,18 +42,22 @@ dotfiles/
 ## 📚 Configuration Files Description
 
 - **`.zshenv`** - Loaded every time zsh starts (including non-interactive shells)
+
   - Suitable for: environment variables, PATH, credentials, etc.
   - Load order: loaded first
-  
+
 - **`.zshrc`** - Loaded only for interactive shells
+
   - Suitable for: Oh My Zsh, aliases, prompts, plugins
   - Load order: after .zshenv
 
 - **`env.zsh`** - Public environment variables
+
   - Java, Python, Docker path configurations, etc.
 
 - **`aliases.zsh`** - Command aliases
 - **`functions.zsh`** - Custom commands and functions
+
   - Complex custom commands, shell functions
   - Can include logic and parameter handling
 
@@ -68,17 +73,20 @@ dotfiles/
 This repository uses **separation management**, dividing configurations into two categories:
 
 **✅ Public Configuration** (committed to git)
+
 - `zsh/env.zsh` - General environment variables (Java, Python, Node.js, Podman paths, etc.)
 - `zsh/aliases.zsh` - Command aliases (including Podman Docker compatibility aliases)
 - `zsh/.zshrc` - Main configuration file
 
 **🔒 Sensitive Configuration** (not committed to git)
+
 - `zsh/secrets.zsh` - Contains all tokens, credentials
 - Excluded in `.gitignore`, will never be committed
 
 ### Three Ways to Manage Tokens
 
 #### Option 1: Local Development (Recommended) ✨
+
 ```bash
 # secrets.zsh already contains your current tokens
 # It's in .gitignore and won't be committed to git
@@ -89,6 +97,7 @@ git status  # should not see secrets.zsh
 ```
 
 #### Option 2: New Machine Migration
+
 ```bash
 # On new machine
 git clone https://github.com/cloud4td/dotfiles.git ~/work/talkdesk/code/dotfiles
@@ -107,6 +116,7 @@ vim zsh/secrets.zsh  # Fill in real tokens
 In VS Code devcontainer or GitHub Codespaces, sensitive information is passed via **environment variables**:
 
 **Option A - Local Environment Variables** (For devcontainer)
+
 ```bash
 # Your tokens are already in ~/.zshrc on your host machine
 # devcontainer will automatically read these environment variables from host
@@ -114,6 +124,7 @@ In VS Code devcontainer or GitHub Codespaces, sensitive information is passed vi
 ```
 
 **Option B - GitHub Codespaces Secrets** (For Codespaces)
+
 1. Go to GitHub repository → Settings
 2. Secrets and variables → Codespaces
 3. Add required secrets:
@@ -178,15 +189,18 @@ source ~/.zshrc
 - ⚠️ Use `git status` to confirm no accidental commits of sensitive files
 - 🔄 Regularly rotate your tokens
 - 🚨 If accidentally committed, use `git filter-branch` or BFG Repo-Cleaner to clean history
+
 ## 🛠️ Dependencies
 
 ### Core Tools
+
 - zsh
 - oh-my-zsh (automatically installed by installation script)
 - git
 - Homebrew (macOS package manager)
 
 ### Development Tools (installed via setup scripts)
+
 - **Node.js**: fnm (Fast Node Manager)
 - **Python**: uv + Poetry
 - **Java/JVM**: SDKMAN (manages Java, Maven, Gradle, Kotlin, Scala)
@@ -196,6 +210,7 @@ source ~/.zshrc
   - podman-compose
 
 ### Setup Scripts
+
 ```bash
 # Run individual setup scripts
 ./scripts/setup-fnm.sh      # Install Node.js via fnm
@@ -208,12 +223,14 @@ source ~/.zshrc
 ## 💡 Terminal Support
 
 This configuration supports the following terminals:
+
 - **Warp** - Modern terminal, automatically reads `.zshrc` and all configurations
 - **VS Code Integrated Terminal** - Configured via `EDITOR=code`
 - **iTerm2** - Standard zsh configuration
 - **Default macOS Terminal** - Standard zsh configuration
 
 Warp specific notes:
+
 - Warp automatically applies your Oh My Zsh themes and plugins
 - Warp's AI features and auto-completion remain enabled
 - All environment variables and aliases work normally

@@ -32,9 +32,9 @@ export DOCKER_HOST="unix:///var/run/docker.sock"
 
 # Legacy Docker paths (kept for compatibility)
 export PATH="$PATH:$HOME/.docker/bin"
-# Legacy Docker paths (kept for compatibility)
-export PATH="$PATH:$HOME/.docker/bin"
 export PATH="/usr/local/sbin:$PATH"
+
+# .NET (managed via dotnet-install script, similar to fnm/uv/sdkman)
 export DOTNET_ROOT="$HOME/.dotnet"
 export PATH="$DOTNET_ROOT:$PATH"
 # Disable telemetry for privacy
