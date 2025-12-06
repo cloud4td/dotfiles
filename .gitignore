@@ -1,0 +1,11 @@
+# 敏感信息文件 - 不要提交到 git
+.env.local
+.secrets
+secrets.zsh
+
+# macOS
+.DS_Store
+
+# 备份文件
+*.bak
+*~

@@ -1,0 +1,31 @@
+{
+  "name": "Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  
+  // 从 host 挂载 dotfiles
+  "mounts": [
+    "source=${localEnv:HOME}/work/talkdesk/code/dotfiles,target=/home/vscode/dotfiles,type=bind,consistency=cached"
+  ],
+  
+  // 容器启动后运行的命令
+  "postCreateCommand": "bash /home/vscode/dotfiles/scripts/install.sh",
+  
+  // 从 GitHub Secrets 或环境变量传递敏感信息
+  "remoteEnv": {
+    "COPILOT_MCP_FIGMA_API_TOKEN": "${localEnv:COPILOT_MCP_FIGMA_API_TOKEN}",
+    "SNYK_TOKEN": "${localEnv:SNYK_TOKEN}",
+    "FEDRAMP_SAR_CREDENTIAL_BASE64": "${localEnv:FEDRAMP_SAR_CREDENTIAL_BASE64}",
+    "SONARQUBE_TOKEN": "${localEnv:SONARQUBE_TOKEN}",
+    "BUNDLE_GITHUB__COM": "${localEnv:BUNDLE_GITHUB__COM}",
+    "HOMEBREW_GITHUB_API_TOKEN": "${localEnv:HOMEBREW_GITHUB_API_TOKEN}",
+    "COM_TD_WFM_DIALOGFLOW_CREDENTIALS": "${localEnv:COM_TD_WFM_DIALOGFLOW_CREDENTIALS}"
+  },
+  
+  // 自定义功能
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true
+    }
+  }
+}
