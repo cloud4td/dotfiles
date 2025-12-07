@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Setup Podman as Docker replacement with compatibility mode
-# This script installs Podman, enables Docker compatibility, and sets up docker-compose
+# This script installs Podman via Homebrew, enables Docker compatibility, and sets up docker-compose
+# Note: Only Homebrew installation is used to avoid conflicts with standalone installers
 
 set -e
 

@@ -27,6 +27,8 @@ export PATH="$HOME/.local/bin:$PATH"
 # Both Poetry and uv can coexist - use Poetry for existing projects, uv for new ones
 
 # Podman (Docker replacement with compatibility mode)
+# Using Homebrew installation (/opt/homebrew/bin/podman) to avoid conflicts
+# Standalone installation at /opt/podman/bin is not added to PATH
 # Docker socket is provided by Podman machine
 export DOCKER_HOST="unix:///var/run/docker.sock"
 
