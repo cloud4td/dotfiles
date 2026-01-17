@@ -1,0 +1,21 @@
+#!/bin/zsh
+
+# Sign Commit PR - Create a new PR with signed commits
+# Usage: sign-commit-pr <PR_URL>
+
+if [ -z "$1" ]; then
+  echo "Usage: sign-commit-pr <PR_URL>"
+  echo "Example: sign-commit-pr https://github.com/Talkdesk/pm-monorepo/pull/49"
+  echo ""
+  echo "This will create a new PR with signed commits from the original PR"
+  exit 1
+fi
+
+PR_URL="$1"
+
+# Use the generic gh-run-approve command
+gh-run-approve \
+  --repo Talkdesk/wem-common-workflows \
+  --workflow sign-commit-pr.yaml \
+  --input pr_url="$PR_URL" \
+  --wait-timeout 60
