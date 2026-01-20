@@ -73,14 +73,37 @@ else
     PROMPT_CHAR="%(?:${PROMPT_SYMBOL_COLOR}:${ERROR_SYMBOL_COLOR})❯${RESET}"
 fi
 
-# Directory with home replacement
-CURRENT_DIR="${DIR_COLOR}%~${RESET}"
+# Directory with home replacement (shortened)
+# Show only last two path components to keep prompt compact.
+short_cwd() {
+    local path=${PWD/#$HOME/~}
+    local -a parts tail
+    parts=(${(s:/:)path})
+    local len=${#parts[@]}
+
+    if (( len <= 3 )); then
+        echo "${path}"
+        return
+    fi
+
+    # If path is inside home (starts with ~), join last two components with ~/
+    if [[ $path == ~* ]]; then
+        tail=(${parts[-2,-1]})
+        echo "~/${(j:/:)tail}"
+    else
+        tail=(${parts[-2,-1]})
+        echo ".../${(j:/:)tail}"
+    fi
+}
+
+# Do not pre-evaluate current directory into a static variable (it becomes stale).
+# The prompt will call `short_cwd()` at render time so the directory updates on `cd`.
 
 # Build the prompt
 # Format: [user@host] directory (git-branch) ✗✓+
 # ❯
-PROMPT='${USER_HOST} ${CURRENT_DIR}${vcs_info_msg_0_}${GIT_STATUS}
+PROMPT='${USER_HOST} ${DIR_COLOR}$(short_cwd)${RESET}${vcs_info_msg_0_}${GIT_STATUS}
 ${PROMPT_CHAR} '
 
 # Right prompt (optional): time and exit code
-RPROMPT='%(?..%F{red}✘ %?%f) %F{242}%*%f'
+RPROMPT='%(?..%F{red}✘ %?%f)'
