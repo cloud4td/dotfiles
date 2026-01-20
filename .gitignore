@@ -2,6 +2,7 @@
 .env.local
 .secrets
 secrets.zsh
+vscode/mcp.json
 
 # macOS
 .DS_Store
