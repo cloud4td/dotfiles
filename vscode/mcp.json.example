@@ -1,9 +1,9 @@
 {
   "servers": {
-    "wfm-docs": {
+    "td-docs": {
       "type": "stdio",
       "command": "node",
-      "args": ["/Users/cloud/work/talkdesk/code/confucius/mcp/wfm-docs/build/index.js"]
+      "args": ["/Users/cloud/work/talkdesk/code/confucius/mcp/td-docs/build/index.js"]
     },
     "atlassian-jira": {
       "type": "stdio",
@@ -22,6 +22,9 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "$GITHUB_TOKEN"
       }
+    },
+    "notebooklm-mcp": {
+      "command": "/Users/cloud/.local/bin/notebooklm-mcp"
     }
   },
   "inputs": []

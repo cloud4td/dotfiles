@@ -1,0 +1,158 @@
+#!/bin/bash
+
+# Common exclusion patterns
+EXCLUDE="node_modules/,dist/,build/,target/,bin/,obj/,out/,.git/,.vscode/,.idea/,venv/,.venv/,__pycache__/,*.log,package-lock.json,pnpm-lock.yaml,yarn.lock,poetry.lock,Pipfile.lock,*.png,*.jpg,*.jpeg,*.gif,*.svg,*.ico,*.pdf,*.zip,*.tar.gz,*.pyc,*.pyo,*.class,*.jar,*.war,*.map,.gradle/,.mvn/,.pytest_cache/,.tox/,.coverage,.next/,.nuxt/,coverage/,.nyc_output/,*.egg-info/,.DS_Store,tmp/,temp/,cache/,.cache/,*.swp,*.swo,.env.local,.env.*.local,**/test/resources/**,**/tests/resources/**,**/test/data/**,**/tests/data/**,**/__tests__/data/**,**/test/fixtures/**,**/tests/fixtures/**,**/__tests__/fixtures/**,**/__snapshots__/**,**/test/mocks/**,**/tests/mocks/**,**/__mocks__/**,*_dataset.sql,*_data.sql,*seed*.sql,*initialize_data.sql,insert_holidays*.sql,**/sql-scripts/**,**/psdata/**,**/testdata/**,**/test-data/**,**/bower/**,**/bower_components/**,**/db-schema/**,**/fonts/**"
+
+# Output directory
+OUTPUT_DIR="prompts"
+
+# Default format and encoding
+FORMAT="markdown"
+ENCODING="cl100k"  # GPT-4/GPT-3.5-turbo encoding (most accurate for modern LLMs)
+
+# Parse command line arguments
+show_help() {
+    echo "Usage: $0 [OPTIONS] [TARGET]"
+    echo ""
+    echo "Generate code documentation for the entire workspace or specific repositories."
+    echo ""
+    echo "OPTIONS:"
+    echo "  -f, --format FORMAT      Output format: xml (default) or markdown"
+    echo "  -e, --encoding ENCODING  Token encoding: cl100k (default), p50k, p50k_edit, r50k"
+    echo "  -o, --output DIR         Output directory (default: prompts)"
+    echo "  -q, --quiet              Suppress progress messages"
+    echo "  -h, --help               Show this help message"
+    echo ""
+    echo "TARGET:"
+    echo "  (empty)                  Generate all documentation (root + all repos)"
+    echo "  root                     Generate only root documentation"
+    echo "  <repo-name>              Generate only specific repo documentation"
+    echo ""
+    echo "ENCODING OPTIONS:"
+    echo "  cl100k                   GPT-4, GPT-3.5-turbo (recommended, most accurate)"
+    echo "  p50k                     Codex models"
+    echo "  p50k_edit                Codex edit models"
+    echo "  r50k                     GPT-3 models (legacy)"
+    echo ""
+    echo "Examples:"
+    echo "  $0                       # Generate all files in XML format with cl100k"
+    echo "  $0 -f markdown           # Generate all files in Markdown format"
+    echo "  $0 -e p50k root          # Generate root with Codex encoding"
+    echo "  $0 -q wfm-core           # Update wfm-core quietly"
+    echo "  $0 -f markdown root      # Update root in Markdown format"
+    echo ""
+    echo "Available repositories:"
+    ls -d repos/*/ 2>/dev/null | xargs -n 1 basename | sed 's/^/  - /'
+}
+
+# Parse options
+QUIET=""
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -f|--format)
+            FORMAT="$2"
+            shift 2
+            ;;
+        -e|--encoding)
+            ENCODING="$2"
+            shift 2
+            ;;
+        -o|--output)
+            OUTPUT_DIR="$2"
+            shift 2
+            ;;
+        -q|--quiet)
+            QUIET="-q"
+            shift
+            ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        -*)
+            echo "Unknown option: $1"
+            show_help
+            exit 1
+            ;;
+        *)
+            TARGET="$1"
+            shift
+            ;;
+    esac
+done
+
+# Validate format
+if [[ "$FORMAT" != "xml" && "$FORMAT" != "markdown" ]]; then
+    echo "❌ Error: Invalid format '$FORMAT'. Use 'xml' or 'markdown'."
+    exit 1
+fi
+
+# Validate encoding
+if [[ "$ENCODING" != "cl100k" && "$ENCODING" != "p50k" && "$ENCODING" != "p50k_edit" && "$ENCODING" != "r50k" ]]; then
+    echo "❌ Error: Invalid encoding '$ENCODING'. Use 'cl100k', 'p50k', 'p50k_edit', or 'r50k'."
+    exit 1
+fi
+
+# Create output directory
+mkdir -p "$OUTPUT_DIR"
+
+# Determine file extension
+if [ "$FORMAT" = "xml" ]; then
+    EXT="xml"
+else
+    EXT="md"
+fi
+
+# Generate documentation
+generate_root() {
+    echo "📝 Generating root documentation..."
+    code2prompt . -e "repos/**,$EXCLUDE" -F "$FORMAT" --encoding "$ENCODING" -l $QUIET > "$OUTPUT_DIR/prompt-root.txt"
+    echo "✅ Generated: $OUTPUT_DIR/prompt-root.txt"
+}
+
+generate_repo() {
+    local repo_name="$1"
+    if [ -d "repos/$repo_name" ]; then
+        echo "📝 Generating $repo_name documentation..."
+        code2prompt "repos/$repo_name" -e "$EXCLUDE" -F "$FORMAT" --encoding "$ENCODING" -l $QUIET > "$OUTPUT_DIR/prompt-${repo_name}.txt"
+        echo "✅ Generated: $OUTPUT_DIR/prompt-${repo_name}.txt"
+    else
+        echo "❌ Error: Repository 'repos/$repo_name' not found"
+        exit 1
+    fi
+}
+
+generate_all() {
+    echo "📝 Generating all documentation in $FORMAT format..."
+    echo ""
+
+    # Generate root
+    generate_root
+    echo ""
+
+    # Generate all repos
+    echo "📝 Generating repository documentations..."
+    for repo in repos/*/; do
+        if [ -d "$repo" ]; then
+            repo_name=$(basename "$repo")
+            echo "  Processing $repo_name..."
+            code2prompt "$repo" -e "$EXCLUDE" -F "$FORMAT" --encoding "$ENCODING" -l $QUIET > "$OUTPUT_DIR/prompt-${repo_name}.txt"
+        fi
+    done
+
+    echo ""
+    echo "✨ Done! All prompts generated in $OUTPUT_DIR/"
+    echo "📊 Total files: $(ls -1 $OUTPUT_DIR | wc -l)"
+}
+
+# Execute based on target
+if [ -z "$TARGET" ]; then
+    # No target specified - generate all
+    generate_all
+elif [ "$TARGET" = "root" ]; then
+    # Generate only root
+    generate_root
+else
+    # Generate specific repo
+    generate_repo "$TARGET"
+fi
