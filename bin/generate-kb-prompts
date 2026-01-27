@@ -19,6 +19,7 @@ show_help() {
     echo "OPTIONS:"
     echo "  -f, --format FORMAT      Output format: xml (default) or markdown"
     echo "  -e, --encoding ENCODING  Token encoding: cl100k (default), p50k, p50k_edit, r50k"
+    echo "  -i, --include PATTERNS   Include only specific file patterns (e.g., '*.md,*.txt')"
     echo "  -o, --output DIR         Output directory (default: prompts)"
     echo "  -q, --quiet              Suppress progress messages"
     echo "  -h, --help               Show this help message"
@@ -35,11 +36,14 @@ show_help() {
     echo "  r50k                     GPT-3 models (legacy)"
     echo ""
     echo "Examples:"
-    echo "  $0                       # Generate all files in XML format with cl100k"
-    echo "  $0 -f markdown           # Generate all files in Markdown format"
-    echo "  $0 -e p50k root          # Generate root with Codex encoding"
-    echo "  $0 -q wfm-core           # Update wfm-core quietly"
-    echo "  $0 -f markdown root      # Update root in Markdown format"
+    echo "  $0                           # Generate all files in XML format with cl100k"
+    echo "  $0 -f markdown               # Generate all files in Markdown format"
+    echo "  $0 -e p50k root              # Generate root with Codex encoding"
+    echo "  $0 -q wfm-core               # Update wfm-core quietly"
+    echo "  $0 -f markdown root          # Update root in Markdown format"
+    echo "  $0 -i '*.md'                 # Include only markdown files"
+    echo "  $0 -i '*.md,*.txt' root      # Include only markdown and text files in root"
+    echo "  $0 -i '*.py,*.sh' wfm-core   # Include only Python and shell scripts in wfm-core"
     echo ""
     echo "Available repositories:"
     ls -d repos/*/ 2>/dev/null | xargs -n 1 basename | sed 's/^/  - /'
@@ -47,6 +51,7 @@ show_help() {
 
 # Parse options
 QUIET=""
+INCLUDE=""
 while [[ $# -gt 0 ]]; do
     case $1 in
         -f|--format)
@@ -55,6 +60,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -e|--encoding)
             ENCODING="$2"
+            shift 2
+            ;;
+        -i|--include)
+            INCLUDE="$2"
             shift 2
             ;;
         -o|--output)
@@ -106,7 +115,11 @@ fi
 # Generate documentation
 generate_root() {
     echo "📝 Generating root documentation..."
-    code2prompt . -e "repos/**,$EXCLUDE" -F "$FORMAT" --encoding "$ENCODING" -l $QUIET > "$OUTPUT_DIR/prompt-root.txt"
+    local cmd="code2prompt . -e \"repos/**,$EXCLUDE\" -F \"$FORMAT\" --encoding \"$ENCODING\" -l $QUIET"
+    if [ -n "$INCLUDE" ]; then
+        cmd="$cmd -i \"$INCLUDE\""
+    fi
+    eval "$cmd > \"$OUTPUT_DIR/prompt-root.txt\""
     echo "✅ Generated: $OUTPUT_DIR/prompt-root.txt"
 }
 
@@ -114,7 +127,11 @@ generate_repo() {
     local repo_name="$1"
     if [ -d "repos/$repo_name" ]; then
         echo "📝 Generating $repo_name documentation..."
-        code2prompt "repos/$repo_name" -e "$EXCLUDE" -F "$FORMAT" --encoding "$ENCODING" -l $QUIET > "$OUTPUT_DIR/prompt-${repo_name}.txt"
+        local cmd="code2prompt \"repos/$repo_name\" -e \"$EXCLUDE\" -F \"$FORMAT\" --encoding \"$ENCODING\" -l $QUIET"
+        if [ -n "$INCLUDE" ]; then
+            cmd="$cmd -i \"$INCLUDE\""
+        fi
+        eval "$cmd > \"$OUTPUT_DIR/prompt-${repo_name}.txt\""
         echo "✅ Generated: $OUTPUT_DIR/prompt-${repo_name}.txt"
     else
         echo "❌ Error: Repository 'repos/$repo_name' not found"
@@ -136,7 +153,11 @@ generate_all() {
         if [ -d "$repo" ]; then
             repo_name=$(basename "$repo")
             echo "  Processing $repo_name..."
-            code2prompt "$repo" -e "$EXCLUDE" -F "$FORMAT" --encoding "$ENCODING" -l $QUIET > "$OUTPUT_DIR/prompt-${repo_name}.txt"
+            local cmd="code2prompt \"$repo\" -e \"$EXCLUDE\" -F \"$FORMAT\" --encoding \"$ENCODING\" -l $QUIET"
+            if [ -n "$INCLUDE" ]; then
+                cmd="$cmd -i \"$INCLUDE\""
+            fi
+            eval "$cmd > \"$OUTPUT_DIR/prompt-${repo_name}.txt\""
         fi
     done
 
