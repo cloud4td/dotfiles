@@ -9,11 +9,12 @@ dotfiles/
 ├── .devcontainer/          # VS Code devcontainer configuration
 │   └── devcontainer.json
 ├── bin/                    # Custom executable commands
-│   └── auto-approve-pr    # Example: Auto-approve PR
+│   ├── auto-approve-pr    # Example: Auto-approve PR
 ├── vscode/                # VS Code configuration
 │   ├── settings.json      # Editor settings
 │   ├── keybindings.json   # Custom keybindings
 │   ├── extensions.txt     # Extension list
+│   ├── mcp.json.example   # MCP server configuration template
 │   └── snippets.code-snippets # Global code snippets
 ├── zsh/                    # Zsh configuration
 │   ├── .zshenv            # Environment variables (loaded by all shells)
@@ -28,6 +29,7 @@ dotfiles/
 ├── scripts/               # Installation and configuration scripts
 │   ├── install.sh         # Main installation script
 │   ├── setup-vscode.sh    # VS Code configuration setup
+│   ├── setup-mcp.sh       # MCP configuration setup
 │   ├── setup-tools.sh     # Common CLI tools installation
 │   ├── setup-fnm.sh       # Node.js version manager setup
 │   ├── setup-python.sh    # Python environment setup (uv + Poetry)
@@ -42,22 +44,18 @@ dotfiles/
 ## 📚 Configuration Files Description
 
 - **`.zshenv`** - Loaded every time zsh starts (including non-interactive shells)
-
   - Suitable for: environment variables, PATH, credentials, etc.
   - Load order: loaded first
 
 - **`.zshrc`** - Loaded only for interactive shells
-
   - Suitable for: Oh My Zsh, aliases, prompts, plugins
   - Load order: after .zshenv
 
 - **`env.zsh`** - Public environment variables
-
   - Java, Python, Docker path configurations, etc.
 
 - **`aliases.zsh`** - Command aliases
 - **`functions.zsh`** - Custom commands and functions
-
   - Complex custom commands, shell functions
   - Can include logic and parameter handling
 
