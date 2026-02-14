@@ -1,4 +1,6 @@
 # Enable auto-env through the sdkman_auto_env config
+# When sdkman_auto_env=true, SDKs will automatically switch when entering this directory
+# This is automatically configured by scripts/setup-sdkman.sh
 # Add key=value pairs of SDKs to use below
 java=17.0.17-tem
 maven=3.9.11

@@ -32,6 +32,12 @@ if ! command -v sdk &> /dev/null; then
     exit 0
 fi
 
+# Enable auto-env for automatic SDK switching based on .sdkmanrc
+echo ""
+echo "🔧 Configuring SDKMAN auto-env..."
+sdk config sdkman_auto_env true
+echo "✅ Auto-env enabled - SDKs will auto-switch when entering directories with .sdkmanrc"
+
 echo ""
 echo "📋 Checking SDKs from .sdkmanrc..."
 

@@ -218,7 +218,72 @@ source ~/.zshrc
 ./scripts/setup-podman.sh   # Install Podman with Docker compatibility
 ```
 
-## 💡 Terminal Support
+## � Version Auto-Switching
+
+This dotfiles configuration supports automatic version switching for multiple languages using version files:
+
+### Supported Version Files
+
+| Tool | Version File | Auto-Switch | How It Works |
+|------|-------------|-------------|--------------|
+| **fnm** (Node.js) | `.node-version` / `.nvmrc` | ✅ Yes | Automatic via `fnm env --use-on-cd` |
+| **SDKMAN** (Java/JVM) | `.sdkmanrc` | ✅ Yes | Automatic via `sdkman_auto_env=true` |
+| **uv** (Python) | `.python-version` | ⚠️ Command-level | Auto-detected by `uv` commands |
+| **.NET** | `global.json` | ⚠️ Command-level | Auto-detected by `dotnet` commands |
+
+### How Auto-Switching Works
+
+**fnm (Node.js)**
+```bash
+# Create version file
+echo "20.10.0" > .node-version
+
+# fnm automatically switches when you cd into the directory
+cd myproject  # Node.js version switches automatically
+```
+
+**SDKMAN (Java/JVM)**
+```bash
+# Create .sdkmanrc file
+sdk env init
+
+# Edit to specify versions
+cat .sdkmanrc
+# java=17.0.17-tem
+# maven=3.9.11
+# gradle=8.5
+
+# Auto-switching enabled by setup script
+cd myproject  # Java/Maven/Gradle versions switch automatically
+```
+
+**uv (Python)**
+```bash
+# Create version file
+echo "3.12" > .python-version
+
+# uv commands automatically detect the version
+uv run script.py  # Uses Python 3.12
+uv sync          # Creates venv with Python 3.12
+```
+
+**.NET**
+```bash
+# Create global.json
+dotnet new globaljson --sdk-version 8.0.300
+
+# dotnet commands use the specified version
+dotnet build  # Uses .NET 8.0.300
+```
+
+### Configuration Details
+
+- **fnm**: Enabled in [zsh/env.zsh](zsh/env.zsh) via `eval "$(fnm env --use-on-cd)"`
+- **SDKMAN**: Enabled during setup in [scripts/setup-sdkman.sh](scripts/setup-sdkman.sh) via `sdk config sdkman_auto_env true`
+- **uv**: Implicit detection, no shell hook required
+- **.NET**: Implicit detection via `global.json`
+
+## �💡 Terminal Support
 
 This configuration supports the following terminals:
 
