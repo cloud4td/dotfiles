@@ -38,6 +38,10 @@ echo "🔧 Configuring SDKMAN auto-env..."
 sdk config sdkman_auto_env true
 echo "✅ Auto-env enabled - SDKs will auto-switch when entering directories with .sdkmanrc"
 
+# Disable auto-update check on shell startup (avoids network access every time a terminal opens)
+sdk config sdkman_selfupdate_feature false
+echo "✅ Self-update check disabled - no network access on shell startup"
+
 echo ""
 echo "📋 Checking SDKs from .sdkmanrc..."
 

@@ -11,12 +11,12 @@ export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.aliyun.com/homebrew/homebrew-bottl
 # Dotfiles bin directory (custom commands)
 export PATH="$HOME/dotfiles/bin:$PATH"
 
-# Java
+# Java (SDKMAN - auto_env disabled, use `senv` to switch manually)
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
-# Node.js (fnm - Fast Node Manager)
-eval "$(fnm env --use-on-cd)"
+# Node.js (fnm - no auto-switch, use `nenv` to switch manually)
+eval "$(fnm env)"
 
 # Python
 # uv manages Python versions (installed: 3.12, 3.13)

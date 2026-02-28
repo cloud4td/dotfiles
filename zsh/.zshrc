@@ -2,72 +2,113 @@
 # This file is loaded only for interactive shells
 # Suitable for Oh My Zsh, aliases, prompts, plugins, etc.
 
-export ZSH="$HOME/.oh-my-zsh"
+# ==========================================
+# Terminal Environment Isolation: AI Agent vs Human Developer
+# ==========================================
+# When AGENT_MODE=1 is set, enter minimal mode for AI agents
+# Otherwise, load the full interactive developer environment
 
-# Theme
-# ZSH_THEME="robbyrussell"  # Disabled to use custom prompt
-ZSH_THEME=""  # Use custom prompt from prompt.zsh
+if [[ "$AGENT_MODE" == "1" ]]; then
 
-# Case-sensitive completion
-# CASE_SENSITIVE="true"
+    # AI Agent mode: minimal, non-blocking shell
+    DOTFILES_DIR="$HOME/dotfiles"
+    [ -f "$DOTFILES_DIR/zsh/agent.zsh" ] && source "$DOTFILES_DIR/zsh/agent.zsh"
 
-# Hyphen-insensitive completion (case-sensitive completion must be off)
-# HYPHEN_INSENSITIVE="true"
+    # Load only essential aliases (docker, etc.) without color aliases
+    [ -f "$DOTFILES_DIR/zsh/aliases.zsh" ] && source "$DOTFILES_DIR/zsh/aliases.zsh"
 
-# Disable bi-weekly auto-update checks
-# zstyle ':omz:update' mode disabled
+    # Agent-specific: override color aliases set by aliases.zsh
+    unalias ls 2>/dev/null
+    unalias ll 2>/dev/null
+    unalias la 2>/dev/null
+    unalias grep 2>/dev/null
+    unalias fgrep 2>/dev/null
+    unalias egrep 2>/dev/null
 
-# Auto-update without prompting
-# zstyle ':omz:update' mode auto
+    # Added by Antigravity
+    export PATH="/Users/cloud/.antigravity/antigravity/bin:$PATH"
 
-# Update frequency (in days)
-# zstyle ':omz:update' frequency 13
+    # OpenClaw Completion
+    source "/Users/cloud/.openclaw/completions/openclaw.zsh"
 
-# Disable auto-setting terminal title
-# DISABLE_AUTO_TITLE="true"
+    return 0
+fi
 
-# Enable command auto-correction
-# ENABLE_CORRECTION="true"
+# ==========================================
+# Human Developer Mode (full interactive environment)
+# Powered by zinit + Powerlevel10k
+# ==========================================
 
-# Display red dots while waiting for completion
-# COMPLETION_WAITING_DOTS="true"
+# ------------------------------------------
+# Powerlevel10k Instant Prompt (must be near top)
+# ------------------------------------------
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
 
-# Disable marking untracked files under VCS as dirty (speeds up large repos)
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
+# ------------------------------------------
+# zinit Plugin Manager
+# ------------------------------------------
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+if [[ ! -f "$ZINIT_HOME/zinit.zsh" ]]; then
+    print -P "%F{33}▓▒░ Installing zinit…%f"
+    mkdir -p "$(dirname $ZINIT_HOME)"
+    git clone --depth=1 https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+fi
+source "${ZINIT_HOME}/zinit.zsh"
 
-# History timestamp format
-# HIST_STAMPS="mm/dd/yyyy"
+# ------------------------------------------
+# Powerlevel10k Theme (async, zero-latency)
+# ------------------------------------------
+zinit ice depth=1
+zinit light romkatv/powerlevel10k
+# Load p10k config (run `p10k configure` to regenerate)
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-# Plugins
-plugins=(
-  git                     # Git aliases and functions
-  gitfast                 # Faster Git completions
-  git-extras              # Extra Git utilities
-  docker                  # Docker aliases and completions
-  docker-compose          # Docker Compose aliases
-  kubectl                 # Kubernetes aliases and completions
-  colored-man-pages       # Colorize man pages
-  command-not-found       # Suggest package for missing commands
-  extract                 # Universal archive extractor
-  sudo                    # Press ESC twice to add sudo
-  web-search              # Search from terminal (google, github, etc.)
-  copypath                # Copy current path to clipboard
-  copyfile                # Copy file content to clipboard
-  dirhistory              # Navigate directory history (Alt+Left/Right)
-  # aws                   # AWS CLI completions
-  # terraform             # Terraform aliases and completions
-  # node                  # Node.js aliases
-  # npm                   # NPM completions
-  zsh-autosuggestions     # Fish-like autosuggestions
-  zsh-syntax-highlighting # Syntax highlighting
-)
+# ------------------------------------------
+# Essential Plugins (三大神器)
+# ------------------------------------------
+# 1. zsh-autosuggestions: Fish-like history suggestions (→ to accept)
+zinit light zsh-users/zsh-autosuggestions
+# 2. zsh-completions: Enhanced Tab completions
+zinit light zsh-users/zsh-completions
+# 3. zsh-syntax-highlighting: Real-time syntax coloring (must be last plugin)
+zinit light zsh-users/zsh-syntax-highlighting
 
-source $ZSH/oh-my-zsh.sh
+# ------------------------------------------
+# OMZ Snippets (cherry-picked, no full OMZ framework)
+# ------------------------------------------
+zinit snippet OMZP::git              # Git aliases and functions
+zinit snippet OMZP::docker           # Docker completions
+zinit snippet OMZP::docker-compose   # Docker Compose completions
+zinit snippet OMZP::kubectl          # Kubernetes aliases and completions
+zinit snippet OMZP::colored-man-pages # Colorize man pages
+zinit snippet OMZP::command-not-found # Suggest package for missing commands
+zinit snippet OMZP::extract          # Universal archive extractor
+zinit snippet OMZP::sudo             # Press ESC twice to add sudo
+zinit snippet OMZP::web-search       # Search from terminal (google, github, etc.)
+zinit snippet OMZP::copypath         # Copy current path to clipboard
+zinit snippet OMZP::copyfile         # Copy file content to clipboard
+zinit snippet OMZP::dirhistory       # Navigate directory history (Alt+Left/Right)
 
-# History configuration
+# ------------------------------------------
+# Completion System
+# ------------------------------------------
+autoload -Uz compinit
+# Only regenerate .zcompdump once a day for speed
+if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+    compinit
+else
+    compinit -C
+fi
+zinit cdreplay -q  # Replay cached completions
+
+# ------------------------------------------
+# History
+# ------------------------------------------
 HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
+HISTSIZE=50000
+SAVEHIST=50000
 setopt APPEND_HISTORY           # Append to history file
 setopt SHARE_HISTORY            # Share history between sessions
 setopt HIST_IGNORE_DUPS         # Ignore duplicate commands
@@ -75,7 +116,12 @@ setopt HIST_IGNORE_ALL_DUPS     # Remove older duplicates
 setopt HIST_IGNORE_SPACE        # Ignore commands starting with space
 setopt HIST_REDUCE_BLANKS       # Remove superfluous blanks
 setopt HIST_VERIFY              # Show command before executing from history
+setopt INC_APPEND_HISTORY       # Write to history immediately
+setopt HIST_FIND_NO_DUPS        # Skip duplicates in history search
 
+# ------------------------------------------
+# Shell Options
+# ------------------------------------------
 # Directory navigation
 setopt AUTO_CD                  # Type directory name to cd
 setopt AUTO_PUSHD               # Make cd push old directory onto stack
@@ -89,18 +135,21 @@ setopt AUTO_MENU                # Show completion menu on tab
 setopt AUTO_LIST                # List choices on ambiguous completion
 setopt MENU_COMPLETE            # Insert first match immediately
 
-# Key bindings
+# ------------------------------------------
+# Key Bindings
+# ------------------------------------------
 bindkey '^[[A' history-search-backward  # Up arrow
 bindkey '^[[B' history-search-forward   # Down arrow
 bindkey '^[[H' beginning-of-line        # Home
 bindkey '^[[F' end-of-line              # End
 bindkey '^[[3~' delete-char             # Delete
 
-# Load custom configurations
+# ------------------------------------------
+# Load Dotfiles Configs
+# ------------------------------------------
 DOTFILES_DIR="$HOME/dotfiles"
 
-# Load custom prompt (must load before other customizations)
-[ -f "$DOTFILES_DIR/zsh/prompt.zsh" ] && source "$DOTFILES_DIR/zsh/prompt.zsh"
+# Prompt is now handled by Powerlevel10k (prompt.zsh no longer needed)
 
 # Load aliases
 [ -f "$DOTFILES_DIR/zsh/aliases.zsh" ] && source "$DOTFILES_DIR/zsh/aliases.zsh"
@@ -111,7 +160,9 @@ DOTFILES_DIR="$HOME/dotfiles"
 # Load Warp specific settings
 [ -f "$DOTFILES_DIR/zsh/warp.zsh" ] && source "$DOTFILES_DIR/zsh/warp.zsh"
 
-# Editor
+# ------------------------------------------
+# Environment (interactive-only)
+# ------------------------------------------
 export EDITOR=code
 export VISUAL=code
 
@@ -131,8 +182,14 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
-# Better directory listing with exa if available
-if command -v exa &> /dev/null; then
+# Better directory listing with eza/exa if available
+if command -v eza &> /dev/null; then
+    alias ls='eza --icons --group-directories-first'
+    alias ll='eza -l --icons --group-directories-first --git'
+    alias la='eza -la --icons --group-directories-first --git'
+    alias lt='eza -T --icons --group-directories-first'
+    alias tree='eza -T --icons'
+elif command -v exa &> /dev/null; then
     alias ls='exa --icons --group-directories-first'
     alias ll='exa -l --icons --group-directories-first --git'
     alias la='exa -la --icons --group-directories-first --git'
@@ -140,7 +197,7 @@ if command -v exa &> /dev/null; then
     alias tree='exa -T --icons'
 fi
 
-# Git aliases (in addition to Oh My Zsh git plugin)
+# Git aliases (supplements OMZP::git)
 alias gst='git status'
 alias gss='git status -s'
 alias glog='git log --oneline --graph --decorate --all'
@@ -156,3 +213,6 @@ alias gba='git branch -a'
 
 # Added by Antigravity
 export PATH="/Users/cloud/.antigravity/antigravity/bin:$PATH"
+
+# OpenClaw Completion
+source "/Users/cloud/.openclaw/completions/openclaw.zsh"
