@@ -72,8 +72,10 @@ zinit light romkatv/powerlevel10k
 zinit light zsh-users/zsh-autosuggestions
 # 2. zsh-completions: Enhanced Tab completions
 zinit light zsh-users/zsh-completions
-# 3. zsh-syntax-highlighting: Real-time syntax coloring (must be last plugin)
+# 3. zsh-syntax-highlighting: Real-time syntax coloring
 zinit light zsh-users/zsh-syntax-highlighting
+# 4. zsh-history-substring-search: ↑↓ searches history by substring (load after syntax-highlighting)
+zinit light zsh-users/zsh-history-substring-search
 
 # ------------------------------------------
 # OMZ Snippets (cherry-picked, no full OMZ framework)
@@ -138,8 +140,8 @@ setopt MENU_COMPLETE            # Insert first match immediately
 # ------------------------------------------
 # Key Bindings
 # ------------------------------------------
-bindkey '^[[A' history-search-backward  # Up arrow
-bindkey '^[[B' history-search-forward   # Down arrow
+bindkey '^[[A' history-substring-search-up    # Up arrow: substring history search
+bindkey '^[[B' history-substring-search-down  # Down arrow: substring history search
 bindkey '^[[H' beginning-of-line        # Home
 bindkey '^[[F' end-of-line              # End
 bindkey '^[[3~' delete-char             # Delete
