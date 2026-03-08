@@ -22,6 +22,10 @@
         "CONFLUENCE_USERNAME": "li.jiang@talkdesk.com",
         "CONFLUENCE_API_TOKEN": "${JIRA_API_TOKEN}"
       }
+    },
+    "Figma": {
+      "url": "https://mcp.figma.com/mcp",
+      "type": "http"
     }
   },
   "inputs": []
