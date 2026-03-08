@@ -81,6 +81,33 @@ gh-run-approve --repo Talkdesk/wem-common-workflows \
 - Access to `Talkdesk/wem-common-workflows` repository
 - Appropriate permissions to approve workflow deployments
 
+### `gh-resolve-pr-conversations`
+Resolve all unresolved review conversations in a GitHub pull request.
+
+**What it does:**
+1. Accepts a GitHub PR URL
+2. Fetches all review threads via GitHub GraphQL, including pagination
+3. Filters unresolved threads
+4. Resolves each unresolved thread automatically
+
+**Usage:**
+```bash
+# Resolve all unresolved conversations on a PR
+gh-resolve-pr-conversations https://github.com/owner/repo/pull/123
+
+# Preview which conversations would be resolved without changing anything
+gh-resolve-pr-conversations --dry-run https://github.com/owner/repo/pull/123
+```
+
+**Options:**
+- `--dry-run` - List unresolved conversation count without resolving them
+- `--help`, `-h` - Show help
+
+**Requirements:**
+- GitHub CLI (`gh`) must be installed and authenticated
+- `jq` must be installed
+- Appropriate permissions to resolve PR review conversations
+
 ## Adding New Commands
 
 1. Create a new file in `bin/` (without extension)

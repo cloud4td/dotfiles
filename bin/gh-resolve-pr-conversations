@@ -1,0 +1,186 @@
+#!/bin/zsh
+
+# Resolve all unresolved review conversations in a GitHub pull request.
+# Usage: gh-resolve-pr-conversations [--dry-run] <PR_URL>
+
+set -euo pipefail
+
+DRY_RUN=false
+PR_URL=""
+
+print_usage() {
+  cat << 'EOF'
+Usage: gh-resolve-pr-conversations [--dry-run] <PR_URL>
+
+Resolve all unresolved review conversations in a GitHub pull request.
+
+Options:
+  --dry-run    Show how many unresolved conversations exist without resolving them
+  --help, -h   Show this help message
+
+Example:
+  gh-resolve-pr-conversations https://github.com/owner/repo/pull/123
+  gh-resolve-pr-conversations --dry-run https://github.com/owner/repo/pull/123
+EOF
+}
+
+require_command() {
+  local command_name="$1"
+
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    echo "❌ Missing required command: $command_name"
+    exit 1
+  fi
+}
+
+graphql_query() {
+  local cursor="$1"
+
+  if [[ -n "$cursor" ]]; then
+    gh api graphql \
+      -f owner="$OWNER" \
+      -f repo="$REPO" \
+      -F number="$PR_NUMBER" \
+      -f cursor="$cursor" \
+      -f query='query($owner: String!, $repo: String!, $number: Int!, $cursor: String) {
+        repository(owner: $owner, name: $repo) {
+          pullRequest(number: $number) {
+            reviewThreads(first: 100, after: $cursor) {
+              nodes {
+                id
+                isResolved
+              }
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+            }
+          }
+        }
+      }'
+  else
+    gh api graphql \
+      -f owner="$OWNER" \
+      -f repo="$REPO" \
+      -F number="$PR_NUMBER" \
+      -f query='query($owner: String!, $repo: String!, $number: Int!) {
+        repository(owner: $owner, name: $repo) {
+          pullRequest(number: $number) {
+            reviewThreads(first: 100) {
+              nodes {
+                id
+                isResolved
+              }
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+            }
+          }
+        }
+      }'
+  fi
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run)
+      DRY_RUN=true
+      shift
+      ;;
+    --help|-h)
+      print_usage
+      exit 0
+      ;;
+    *)
+      if [[ -n "$PR_URL" ]]; then
+        echo "❌ Unexpected argument: $1"
+        print_usage
+        exit 1
+      fi
+
+      PR_URL="$1"
+      shift
+      ;;
+  esac
+done
+
+if [[ -z "$PR_URL" ]]; then
+  echo "❌ Missing PR URL"
+  print_usage
+  exit 1
+fi
+
+if [[ ! "$PR_URL" =~ '^https://github\.com/([^/]+)/([^/]+)/pull/([0-9]+)(/.*)?$' ]]; then
+  echo "❌ Invalid GitHub PR URL: $PR_URL"
+  echo "Expected format: https://github.com/owner/repo/pull/123"
+  exit 1
+fi
+
+require_command gh
+require_command jq
+
+OWNER="${match[1]}"
+REPO="${match[2]}"
+PR_NUMBER="${match[3]}"
+
+echo "🔍 Loading review conversations for $OWNER/$REPO PR #$PR_NUMBER"
+
+THREAD_IDS=()
+CURSOR=""
+
+while true; do
+  RESPONSE="$(graphql_query "$CURSOR")"
+
+  if [[ "$(echo "$RESPONSE" | jq -r '.data.repository.pullRequest == null')" == "true" ]]; then
+    echo "❌ Pull request not found: $PR_URL"
+    exit 1
+  fi
+
+  while IFS= read -r thread_id; do
+    if [[ -n "$thread_id" ]]; then
+      THREAD_IDS+=("$thread_id")
+    fi
+  done < <(echo "$RESPONSE" | jq -r '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | .id')
+
+  HAS_NEXT_PAGE="$(echo "$RESPONSE" | jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.hasNextPage')"
+  CURSOR="$(echo "$RESPONSE" | jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.endCursor // ""')"
+
+  if [[ "$HAS_NEXT_PAGE" != "true" ]]; then
+    break
+  fi
+done
+
+THREAD_COUNT=${#THREAD_IDS[@]}
+
+if [[ "$THREAD_COUNT" -eq 0 ]]; then
+  echo "✅ No unresolved conversations found."
+  exit 0
+fi
+
+if [[ "$DRY_RUN" == "true" ]]; then
+  echo "ℹ️  Found $THREAD_COUNT unresolved conversation(s)."
+  exit 0
+fi
+
+echo "🧵 Resolving $THREAD_COUNT unresolved conversation(s)..."
+
+resolved_count=0
+
+for thread_id in "${THREAD_IDS[@]}"; do
+  gh api graphql \
+    -f threadId="$thread_id" \
+    -f query='mutation($threadId: ID!) {
+      resolveReviewThread(input: {threadId: $threadId}) {
+        thread {
+          id
+          isResolved
+        }
+      }
+    }' >/dev/null
+
+  resolved_count=$((resolved_count + 1))
+  echo "   Resolved $resolved_count/$THREAD_COUNT"
+done
+
+echo "✅ Resolved $THREAD_COUNT conversation(s)."
