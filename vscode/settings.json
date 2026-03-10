@@ -269,6 +269,7 @@
   "chat.agent.maxRequests": 100,
   "chat.tools.global.autoApprove": true,
   "workbench.browser.enableChatTools": true,
+  "githubPullRequests.pullBranch": "never",
   "chat.viewSessions.orientation": "stacked",
 
   // Note: Snyk configurations (snyk.folderConfigs, snyk.advanced.cliPath, etc.)
