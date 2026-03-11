@@ -3,6 +3,14 @@
     "notebooklm-mcp": {
       "command": "/Users/cloud/.local/bin/notebooklm-mcp"
     },
+    "anythingllm": {
+      "command": "npx",
+      "args": ["-y", "anythingllm-mcp-server"],
+      "env": {
+        "ANYTHINGLLM_API_KEY": "${ANYTHINGLLM_API_KEY}",
+        "ANYTHINGLLM_BASE_URL": "http://localhost:3001"
+      }
+    },
     "mcp-atlassian": {
       "command": "uvx",
       "args": ["mcp-atlassian"],
@@ -14,6 +22,10 @@
         "CONFLUENCE_USERNAME": "li.jiang@talkdesk.com",
         "CONFLUENCE_API_TOKEN": "${JIRA_API_TOKEN}"
       }
+    },
+    "Figma": {
+      "url": "https://mcp.figma.com/mcp",
+      "type": "http"
     }
   },
   "inputs": []
