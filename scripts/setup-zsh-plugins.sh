@@ -1,61 +1,91 @@
 #!/usr/bin/env bash
-# Setup Oh My Zsh plugins
-# This script installs commonly used Oh My Zsh plugins
+# Setup zinit plugin manager and zsh plugins
+# This script installs zinit, Powerlevel10k, and essential zsh plugins
 
 set -e
 
-echo "🔌 Setting up Oh My Zsh plugins..."
+echo "🔌 Setting up zinit and zsh plugins..."
 echo ""
 
-# Check if Oh My Zsh is installed
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    echo "❌ Oh My Zsh is not installed"
-    echo "💡 Run the install script first: ./scripts/install.sh"
-    exit 1
-fi
+# ------------------------------------------
+# Install zinit plugin manager
+# ------------------------------------------
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
-echo "✅ Oh My Zsh is installed"
-echo ""
-
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-
-# Install zsh-autosuggestions
-if [ -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
-    echo "✅ zsh-autosuggestions is already installed"
+if [ -f "$ZINIT_HOME/zinit.zsh" ]; then
+    echo "✅ zinit is already installed"
 else
-    echo "📦 Installing zsh-autosuggestions..."
-    git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+    echo "📦 Installing zinit..."
+    mkdir -p "$(dirname "$ZINIT_HOME")"
+    git clone --depth=1 https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
     if [ $? -eq 0 ]; then
-        echo "✅ zsh-autosuggestions installed successfully!"
+        echo "✅ zinit installed successfully!"
     else
-        echo "❌ Failed to install zsh-autosuggestions"
+        echo "❌ Failed to install zinit"
+        exit 1
     fi
 fi
 
 echo ""
 
-# Install zsh-syntax-highlighting
-if [ -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
-    echo "✅ zsh-syntax-highlighting is already installed"
-else
-    echo "📦 Installing zsh-syntax-highlighting..."
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
-    if [ $? -eq 0 ]; then
-        echo "✅ zsh-syntax-highlighting installed successfully!"
-    else
-        echo "❌ Failed to install zsh-syntax-highlighting"
-    fi
-fi
+# ------------------------------------------
+# Pre-clone plugins for faster first shell startup
+# ------------------------------------------
+# zinit auto-installs plugins on first `source ~/.zshrc`, but pre-cloning
+# avoids the delay on first launch.
 
+source "$ZINIT_HOME/zinit.zsh"
+
+echo "📦 Pre-installing plugins via zinit..."
 echo ""
 
+# Powerlevel10k theme
+echo "  → romkatv/powerlevel10k"
+zinit ice depth=1
+zinit light romkatv/powerlevel10k 2>/dev/null || true
+
+# Essential plugins
+for plugin in \
+    zsh-users/zsh-autosuggestions \
+    zsh-users/zsh-completions \
+    zsh-users/zsh-syntax-highlighting \
+    zsh-users/zsh-history-substring-search; do
+    echo "  → $plugin"
+    zinit light "$plugin" 2>/dev/null || true
+done
+
+# OMZ snippets
+for snippet in \
+    OMZP::git \
+    OMZP::docker \
+    OMZP::docker-compose \
+    OMZP::kubectl \
+    OMZP::colored-man-pages \
+    OMZP::command-not-found \
+    OMZP::extract \
+    OMZP::sudo \
+    OMZP::web-search \
+    OMZP::copypath \
+    OMZP::copyfile \
+    OMZP::dirhistory; do
+    echo "  → $snippet"
+    zinit snippet "$snippet" 2>/dev/null || true
+done
+
+echo ""
 echo "🎉 Plugin installation complete!"
 echo ""
 echo "💡 Next steps:"
 echo "  1. Reload your shell: source ~/.zshrc"
 echo "  2. Or restart your terminal"
+echo "  3. Run 'p10k configure' to set up Powerlevel10k theme"
 echo ""
-echo "📝 Installed plugins:"
-echo "  • zsh-autosuggestions   - Fish-like autosuggestions"
-echo "  • zsh-syntax-highlighting - Syntax highlighting for commands"
+echo "📝 Installed components:"
+echo "  • zinit                        - Plugin manager"
+echo "  • Powerlevel10k                - Theme (async, zero-latency)"
+echo "  • zsh-autosuggestions          - Fish-like autosuggestions"
+echo "  • zsh-completions              - Enhanced Tab completions"
+echo "  • zsh-syntax-highlighting      - Real-time syntax coloring"
+echo "  • zsh-history-substring-search - ↑↓ history search by substring"
+echo "  • OMZ snippets                 - git, docker, kubectl, etc."
 echo ""

@@ -34,7 +34,7 @@ echo "📦 Installing modern CLI tools..."
 echo ""
 
 install_tool "bat" "bat"           # Better cat with syntax highlighting
-install_tool "exa" "exa"           # Better ls with colors and git integration
+install_tool "eza" "eza"           # Better ls with colors and git integration (successor to exa)
 install_tool "fd" "fd"             # Better find
 install_tool "rg" "ripgrep"        # Better grep (ripgrep)
 install_tool "fzf" "fzf"           # Fuzzy finder
@@ -94,7 +94,7 @@ echo "📚 Quick Reference:"
 echo ""
 echo "   Modern Unix Tools:"
 echo "      bat <file>              # Syntax-highlighted cat"
-echo "      exa -la                 # Modern ls with git status"
+echo "      eza -la                 # Modern ls with git status"
 echo "      fd <pattern>            # Fast file search"
 echo "      rg <pattern>            # Fast text search"
 echo "      fzf                     # Fuzzy finder (Ctrl+R, Ctrl+T)"
@@ -116,7 +116,7 @@ echo "      tree -L 2               # Directory tree (2 levels)"
 echo ""
 echo "💡 Tips:"
 echo "   - Use 'bat' instead of 'cat' for syntax highlighting"
-echo "   - Use 'exa -la' instead of 'ls -la' for better output"
+echo "   - Use 'eza -la' instead of 'ls -la' for better output"
 echo "   - Use 'rg' instead of 'grep' for faster searching"
 echo "   - Press Ctrl+R to search command history with fzf"
 echo ""

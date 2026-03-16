@@ -8,5 +8,5 @@
 # For example:
 # export WARP_USE_SSH_WRAPPER=0
 
-# Warp automatically uses your Oh My Zsh theme and plugins
-# Current theme: robbyrussell (defined in .zshrc)
+# Warp works with zinit + Powerlevel10k theme
+# Current theme: Powerlevel10k (defined in .zshrc, configured via ~/.p10k.zsh)

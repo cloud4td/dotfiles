@@ -1,6 +1,6 @@
-# Oh My Zsh configuration
+# Zsh Interactive Shell Configuration
 # This file is loaded only for interactive shells
-# Suitable for Oh My Zsh, aliases, prompts, plugins, etc.
+# Powered by zinit + Powerlevel10k
 
 # ==========================================
 # Terminal Environment Isolation: AI Agent vs Human Developer
@@ -29,7 +29,7 @@ if [[ "$AGENT_MODE" == "1" ]]; then
     export PATH="/Users/cloud/.antigravity/antigravity/bin:$PATH"
 
     # OpenClaw Completion
-    source "/Users/cloud/.openclaw/completions/openclaw.zsh"
+    [[ -f "/Users/cloud/.openclaw/completions/openclaw.zsh" ]] && source "/Users/cloud/.openclaw/completions/openclaw.zsh"
 
     return 0
 fi
@@ -217,4 +217,4 @@ alias gba='git branch -a'
 export PATH="/Users/cloud/.antigravity/antigravity/bin:$PATH"
 
 # OpenClaw Completion
-source "/Users/cloud/.openclaw/completions/openclaw.zsh"
+[[ -f "/Users/cloud/.openclaw/completions/openclaw.zsh" ]] && source "/Users/cloud/.openclaw/completions/openclaw.zsh"

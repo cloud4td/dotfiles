@@ -33,13 +33,15 @@ echo "Setting up zsh configuration..."
 create_symlink "$DOTFILES_DIR/zsh/.zshenv" "$HOME/.zshenv"
 create_symlink "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
 
-# Check if Oh My Zsh needs to be installed
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
+# Check if zinit needs to be installed
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+if [ ! -f "$ZINIT_HOME/zinit.zsh" ]; then
     echo ""
-    read -p "Oh My Zsh not found. Install it? (y/N) " -n 1 -r
+    read -p "zinit not found. Install it? (y/N) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+        mkdir -p "$(dirname "$ZINIT_HOME")"
+        git clone --depth=1 https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
     fi
 fi
 
