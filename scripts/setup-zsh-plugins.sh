@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 # Setup zinit plugin manager and zsh plugins
 # This script installs zinit, Powerlevel10k, and essential zsh plugins
 
