@@ -2,7 +2,17 @@
 github.copilot
 github.copilot-chat
 eamodio.gitlens
-ms-vscode.remote-ssh
+github.vscode-pull-request-github
+github.vscode-github-actions
+github.codespaces
+
+# AI Coding Assistants
+anthropic.claude-code
+andrepimenta.claude-code-chat
+kilocode.kilo-code
+rooveterinaryinc.roo-cline
+sst-dev.opencode
+openai.chatgpt
 
 # Language Support - JavaScript/TypeScript
 dbaeumer.vscode-eslint
@@ -12,19 +22,38 @@ bradlc.vscode-tailwindcss
 # Language Support - Python
 ms-python.python
 ms-python.vscode-pylance
+ms-python.debugpy
+ms-python.vscode-python-envs
 charliermarsh.ruff
+
+# Language Support - Java
+redhat.java
+redhat.vscode-quarkus
+redhat.vscode-microprofile
+vscjava.vscode-java-pack
+vscjava.vscode-java-debug
+vscjava.vscode-java-dependency
+vscjava.vscode-java-test
+vscjava.vscode-gradle
+vscjava.vscode-maven
 
 # Language Support - Other
 redhat.vscode-yaml
 tamasfe.even-better-toml
+ms-vscode.makefile-tools
 
-# Docker/Kubernetes
-ms-azuretools.vscode-docker
-ms-kubernetes-tools.vscode-kubernetes-tools
+# Containers
+ms-azuretools.vscode-containers
+
+# Code Quality & Security
+sonarsource.sonarlint-vscode
+snyk-security.snyk-vulnerability-scanner
 
 # Themes & Icons
 pkief.material-icon-theme
+vscode-icons-team.vscode-icons
 github.github-vscode-theme
+johnpapa.vscode-peacock
 
 # Productivity
 usernamehw.errorlens
@@ -32,12 +61,22 @@ christian-kohler.path-intellisense
 gruntfuggly.todo-tree
 streetsidesoftware.code-spell-checker
 wayou.vscode-todo-highlight
+k--kato.intellij-idea-keybindings
+krish-r.vscode-toggle-terminal
+ziyasal.vscode-open-in-github
 
 # Markdown
 yzhang.markdown-all-in-one
 bierner.markdown-mermaid
+davidanson.vscode-markdownlint
 
 # Utilities
 editorconfig.editorconfig
 foxundermoon.shell-format
 shardulm94.trailing-spaces
+clemenspeters.format-json
+tomoki1207.pdf
+
+# Talkdesk / Workspace Specific
+openknot.openclaw-extension
+sethford.atlassian-mcp-server
