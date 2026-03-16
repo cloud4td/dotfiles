@@ -63,7 +63,7 @@ source "${ZINIT_HOME}/zinit.zsh"
 zinit ice depth=1
 zinit light romkatv/powerlevel10k
 # Load p10k config (run `p10k configure` to regenerate)
-[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh || [[ -f "$HOME/dotfiles/zsh/p10k.zsh" ]] && source "$HOME/dotfiles/zsh/p10k.zsh"
 
 # ------------------------------------------
 # Essential Plugins (三大神器)

@@ -32,6 +32,7 @@ echo ""
 echo "Setting up zsh configuration..."
 create_symlink "$DOTFILES_DIR/zsh/.zshenv" "$HOME/.zshenv"
 create_symlink "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+create_symlink "$DOTFILES_DIR/zsh/p10k.zsh" "$HOME/.p10k.zsh"
 
 # Check if zinit needs to be installed
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
