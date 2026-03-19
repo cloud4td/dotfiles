@@ -53,6 +53,23 @@ if [ ! -L "$HOME/dotfiles" ] && [ "$DOTFILES_DIR" != "$HOME/dotfiles" ]; then
     ln -sf "$DOTFILES_DIR" "$HOME/dotfiles"
 fi
 
+# Link Copilot memory files from dotfiles into VS Code's memory-tool directory
+echo ""
+echo "Setting up Copilot memory symlinks..."
+COPILOT_MEMORY_DIR="$HOME/Library/Application Support/Code/User/globalStorage/github.copilot-chat/memory-tool/memories"
+if [ -d "$COPILOT_MEMORY_DIR" ] || mkdir -p "$COPILOT_MEMORY_DIR"; then
+    for mem_file in "$DOTFILES_DIR/memories/"*.md; do
+        [ -f "$mem_file" ] || continue
+        fname="$(basename "$mem_file")"
+        target="$COPILOT_MEMORY_DIR/$fname"
+        if [ ! -L "$target" ]; then
+            backup_if_exists "$target"
+            ln -sf "$mem_file" "$target"
+            echo "  Linked memory: $fname"
+        fi
+    done
+fi
+
 echo ""
 echo "✓ Dotfiles installation complete!"
 echo ""
