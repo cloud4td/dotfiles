@@ -1,15 +1,18 @@
 #!/bin/bash
-# Setup VS Code MCP configuration
+# Setup MCP configuration for VS Code and Claude Code
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
-VSCODE_USER_DIR="$HOME/Library/Application Support/Code/User"
 MCP_TEMPLATE="$DOTFILES_DIR/vscode/mcp.json.example"
-MCP_TARGET="$VSCODE_USER_DIR/mcp.json"
 
-echo "🔧 Setting up VS Code MCP configuration..."
+# Target locations
+VSCODE_USER_DIR="$HOME/Library/Application Support/Code/User"
+VSCODE_MCP_TARGET="$VSCODE_USER_DIR/mcp.json"
+CLAUDE_CONFIG="$HOME/.claude.json"
+
+echo "🔧 Setting up MCP configuration..."
 
 # Check if template exists
 if [ ! -f "$MCP_TEMPLATE" ]; then
@@ -17,43 +20,73 @@ if [ ! -f "$MCP_TEMPLATE" ]; then
     exit 1
 fi
 
-# Create VS Code user directory if it doesn't exist
-mkdir -p "$VSCODE_USER_DIR"
+# Read server definitions from template
+SERVERS=$(cat "$MCP_TEMPLATE")
 
-# Check if mcp.json already exists
-if [ -f "$MCP_TARGET" ]; then
-    echo "⚠️  mcp.json already exists at $MCP_TARGET"
-    read -p "Do you want to backup and replace it? (y/N): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        cp "$MCP_TARGET" "$MCP_TARGET.backup.$(date +%Y%m%d_%H%M%S)"
-        echo "✅ Backup created"
-    else
-        echo "ℹ️  Skipping mcp.json setup"
-        exit 0
+# --- VS Code ---
+setup_vscode() {
+    echo ""
+    echo "📦 VS Code MCP setup..."
+    mkdir -p "$VSCODE_USER_DIR"
+
+    if [ -f "$VSCODE_MCP_TARGET" ]; then
+        echo "⚠️  mcp.json already exists at $VSCODE_MCP_TARGET"
+        read -p "   Backup and replace? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "   ⏭️  Skipped VS Code"
+            return
+        fi
+        cp "$VSCODE_MCP_TARGET" "$VSCODE_MCP_TARGET.backup.$(date +%Y%m%d_%H%M%S)"
+        echo "   ✅ Backup created"
     fi
-fi
 
-# Copy template and substitute environment variables
-echo "📝 Creating mcp.json from template..."
+    # Wrap with "servers" key for VS Code format
+    jq -n --argjson servers "$SERVERS" '{"servers": $servers, "inputs": []}' > "$VSCODE_MCP_TARGET"
+    echo "   ✅ VS Code mcp.json created"
+}
 
-# Use envsubst to replace environment variables
-if command -v envsubst >/dev/null 2>&1; then
-    envsubst < "$MCP_TEMPLATE" > "$MCP_TARGET"
-    echo "✅ mcp.json created with environment variables substituted"
-else
-    # Fallback: just copy the template
-    cp "$MCP_TEMPLATE" "$MCP_TARGET"
-    echo "⚠️  envsubst not found, copied template as-is"
-    echo "ℹ️  You'll need to manually replace \$JIRA_API_TOKEN and \$GITHUB_TOKEN"
-fi
+# --- Claude Code ---
+setup_claude() {
+    echo ""
+    echo "📦 Claude Code MCP setup..."
+
+    if [ -f "$CLAUDE_CONFIG" ]; then
+        # Merge mcpServers into existing config
+        echo "   ℹ️  Merging into existing ~/.claude.json"
+        cp "$CLAUDE_CONFIG" "$CLAUDE_CONFIG.backup.$(date +%Y%m%d_%H%M%S)"
+        jq --argjson servers "$SERVERS" '.mcpServers = $servers' "$CLAUDE_CONFIG.backup."* 2>/dev/null | head -1 > /dev/null || true
+        jq --argjson servers "$SERVERS" '.mcpServers = $servers' "$CLAUDE_CONFIG" > "$CLAUDE_CONFIG.tmp" \
+            && mv "$CLAUDE_CONFIG.tmp" "$CLAUDE_CONFIG"
+        echo "   ✅ Claude Code config updated (backup created)"
+    else
+        # Create new config
+        jq -n --argjson servers "$SERVERS" '{"mcpServers": $servers}' > "$CLAUDE_CONFIG"
+        echo "   ✅ Claude Code config created at ~/.claude.json"
+    fi
+}
+
+# --- Main ---
+echo ""
+echo "Which tools do you want to configure?"
+echo "  1) VS Code only"
+echo "  2) Claude Code only"
+echo "  3) Both (default)"
+read -p "Choice [3]: " choice
+choice=${choice:-3}
+
+case $choice in
+    1) setup_vscode ;;
+    2) setup_claude ;;
+    3) setup_vscode; setup_claude ;;
+    *) echo "❌ Invalid choice"; exit 1 ;;
+esac
 
 echo ""
 echo "✅ MCP configuration setup complete!"
 echo ""
 echo "📋 Next steps:"
 echo "   1. Make sure your secrets.zsh is loaded: source ~/.zshrc"
-echo "   2. Restart VS Code to load the MCP configuration"
+echo "   2. Restart VS Code / Claude Code to load the MCP configuration"
 echo "   3. Verify tokens are set:"
-echo "      echo \$JIRA_API_TOKEN"
-echo "      echo \$GITHUB_TOKEN"
+echo "      echo \$ATLASSIAN_API_TOKEN"

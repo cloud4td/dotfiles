@@ -1,31 +1,28 @@
 {
-  "servers": {
-    "notebooklm-mcp": {
-      "command": "npx",
-      "args": ["notebooklm-mcp@latest"]
-    },
-    "mcp-atlassian": {
-      "command": "uvx",
-      "args": ["mcp-atlassian"],
-      "env": {
-        "JIRA_URL": "https://talkdesk.atlassian.net",
-        "JIRA_USERNAME": "li.jiang@talkdesk.com",
-        "JIRA_API_TOKEN": "${JIRA_API_TOKEN}",
-        "CONFLUENCE_URL": "https://talkdesk.atlassian.net/wiki",
-        "CONFLUENCE_USERNAME": "li.jiang@talkdesk.com",
-        "CONFLUENCE_API_TOKEN": "${JIRA_API_TOKEN}"
-      }
-    },
-    "talkdesk-developer-mcp": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "--registry",
-        "https://hub.talkdeskapp.com:8443/repository/talkdesk-npm",
-        "--prefer-offline",
-        "@talkdesk/developer-mcp@latest"
-      ]
+  "notebooklm-mcp": {
+    "command": "npx",
+    "args": ["notebooklm-mcp@latest"]
+  },
+  "mcp-atlassian": {
+    "command": "uvx",
+    "args": ["mcp-atlassian"],
+    "env": {
+      "JIRA_URL": "https://talkdesk.atlassian.net",
+      "JIRA_USERNAME": "${ATLASSIAN_USER_EMAIL}",
+      "JIRA_API_TOKEN": "${ATLASSIAN_API_TOKEN}",
+      "CONFLUENCE_URL": "https://talkdesk.atlassian.net/wiki",
+      "CONFLUENCE_USERNAME": "${ATLASSIAN_USER_EMAIL}",
+      "CONFLUENCE_API_TOKEN": "${ATLASSIAN_API_TOKEN}"
     }
   },
-  "inputs": []
+  "talkdesk-developer-mcp": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "--registry",
+      "https://hub.talkdeskapp.com:8443/repository/talkdesk-npm",
+      "--prefer-offline",
+      "@talkdesk/developer-mcp@latest"
+    ]
+  }
 }
