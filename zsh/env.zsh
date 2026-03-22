@@ -11,6 +11,9 @@ export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.aliyun.com/homebrew/homebrew-bottl
 # Dotfiles bin directory (custom commands)
 export PATH="$HOME/dotfiles/bin:$PATH"
 
+# tdev (Talkdesk Developer CLI) environment
+[ -f ~/.talkdesk-developer/.env ] && source ~/.talkdesk-developer/.env
+
 # Java (SDKMAN - auto_env disabled, use `senv` to switch manually)
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
