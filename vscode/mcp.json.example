@@ -1,7 +1,8 @@
 {
   "servers": {
     "notebooklm-mcp": {
-      "command": "/Users/cloud/.local/bin/notebooklm-mcp"
+      "command": "npx",
+      "args": ["notebooklm-mcp@latest"]
     },
     "mcp-atlassian": {
       "command": "uvx",
@@ -14,6 +15,16 @@
         "CONFLUENCE_USERNAME": "li.jiang@talkdesk.com",
         "CONFLUENCE_API_TOKEN": "${JIRA_API_TOKEN}"
       }
+    },
+    "talkdesk-developer-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "--registry",
+        "https://hub.talkdeskapp.com:8443/repository/talkdesk-npm",
+        "--prefer-offline",
+        "@talkdesk/developer-mcp@latest"
+      ]
     }
   },
   "inputs": []

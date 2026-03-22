@@ -23,7 +23,7 @@
         "CONFLUENCE_API_TOKEN": "${JIRA_API_TOKEN}"
       }
     },
-    "Figma": {
+    "figma": {
       "url": "https://mcp.figma.com/mcp",
       "type": "http"
     }
