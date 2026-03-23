@@ -61,10 +61,10 @@ if command -v tdev &> /dev/null; then
     echo "📋 Next steps:"
     echo "   1. source ~/.zshrc                              # Reload shell"
     echo "   2. tdev stack find                              # Browse available stacks"
-    echo "   3. tdev stack add recommended/vscode --agent vscode  # Install VS Code stack"
+    echo "   3. tdev stack add official/vscode --agent vscode    # Install VS Code stack"
     echo ""
     echo "   For global install, add -g flag:"
-    echo "   tdev stack add recommended/vscode --agent vscode -g"
+    echo "   tdev stack add official/vscode --agent vscode -g"
 else
     echo ""
     echo "⚠️  tdev command not found in PATH. Try: source ~/.zshrc"

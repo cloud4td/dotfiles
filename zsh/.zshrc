@@ -26,10 +26,10 @@ if [[ "$AGENT_MODE" == "1" ]]; then
     unalias egrep 2>/dev/null
 
     # Added by Antigravity
-    export PATH="/Users/cloud/.antigravity/antigravity/bin:$PATH"
+    export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
 
     # OpenClaw Completion
-    [[ -f "/Users/cloud/.openclaw/completions/openclaw.zsh" ]] && source "/Users/cloud/.openclaw/completions/openclaw.zsh"
+    [[ -f "$HOME/.openclaw/completions/openclaw.zsh" ]] && source "$HOME/.openclaw/completions/openclaw.zsh"
 
     return 0
 fi
@@ -214,7 +214,10 @@ alias gb='git branch'
 alias gba='git branch -a'
 
 # Added by Antigravity
-export PATH="/Users/cloud/.antigravity/antigravity/bin:$PATH"
+export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
 
 # OpenClaw Completion
-[[ -f "/Users/cloud/.openclaw/completions/openclaw.zsh" ]] && source "/Users/cloud/.openclaw/completions/openclaw.zsh"
+[[ -f "$HOME/.openclaw/completions/openclaw.zsh" ]] && source "$HOME/.openclaw/completions/openclaw.zsh"
+
+# bun completions
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
