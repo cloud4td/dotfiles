@@ -48,6 +48,30 @@ setup_memory() {
     fi
 }
 
+# Symlink Claude Code settings.json to dotfiles/claude/settings.json
+setup_claude_code() {
+    echo ""
+    echo "Setting up Claude Code settings symlink..."
+    local claude_dir="$HOME/.claude"
+    local target="$claude_dir/settings.json"
+    local source="$DOTFILES_DIR/claude/settings.json"
+    mkdir -p "$claude_dir"
+    if [ -f "$source" ]; then
+        if [ -f "$target" ] && [ ! -L "$target" ]; then
+            echo "  Backing up existing settings.json..."
+            mv "$target" "${target}.backup.$(date +%Y%m%d_%H%M%S)"
+        fi
+        if [ ! -L "$target" ]; then
+            ln -sf "$source" "$target"
+            echo "  Linked: $target -> $source"
+        else
+            echo "  Already linked: $target"
+        fi
+    else
+        echo "  ⚠️  claude/settings.json not found in dotfiles, skipping"
+    fi
+}
+
 # Parse --only flag
 ONLY=""
 while [[ $# -gt 0 ]]; do
@@ -94,6 +118,9 @@ fi
 
 # Symlink Copilot memory directory
 setup_memory
+
+# Symlink Claude Code settings
+setup_claude_code
 
 echo ""
 echo "✓ Dotfiles installation complete!"

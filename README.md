@@ -10,6 +10,8 @@ dotfiles/
 │   └── devcontainer.json
 ├── bin/                    # Custom executable commands
 │   ├── auto-approve-pr    # Example: Auto-approve PR
+├── claude/                # Claude Code configuration
+│   └── settings.json      # Agent settings (permissions, plugins)
 ├── vscode/                # VS Code configuration
 │   ├── settings.json      # Editor settings
 │   ├── keybindings.json   # Custom keybindings
@@ -29,7 +31,7 @@ dotfiles/
 ├── scripts/               # Installation and configuration scripts
 │   ├── install.sh         # Main installation script
 │   ├── setup-vscode.sh    # VS Code configuration setup
-│   ├── setup-mcp.sh       # MCP configuration setup
+│   ├── setup-agents.sh        # AI tools setup (MCP, Claude Code, Copilot memory)
 │   ├── setup-tools.sh     # Common CLI tools installation
 │   ├── setup-fnm.sh       # Node.js version manager setup
 │   ├── setup-python.sh    # Python environment setup (uv + Poetry)
