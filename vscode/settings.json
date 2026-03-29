@@ -76,6 +76,9 @@
     },
   },
   "terminal.integrated.defaultProfile.osx": "Human Zsh",
+  "terminal.integrated.env.osx": {
+    "PATH": "/opt/homebrew/bin:/opt/homebrew/sbin:${env:PATH}"
+  },
 
   // Git
   "git.autofetch": true,
