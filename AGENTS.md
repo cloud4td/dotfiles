@@ -30,6 +30,15 @@ This is a personal dotfiles repository for macOS, devcontainer, and GitHub Codes
 - When adding new CLI tools, place them in `bin/` and make them executable.
 - When adding new setup steps, create a dedicated `scripts/setup-*.sh` script and call it from `scripts/install.sh`.
 
+## Instructions Placement
+
+There are two levels of agent instructions:
+
+- **Project-level** (`AGENTS.md` at repo root) — rules specific to the current project (architecture, conventions, file structure).
+- **User-level** (`agents/AGENTS.md` in dotfiles) — personal preferences and workflows that apply across all projects.
+
+When the user says "project instructions" or "project-level", write to the root `AGENTS.md`. When the user says "user instructions" or "user-level", write to `agents/AGENTS.md`. If unspecified, decide based on content: project-specific rules go to project-level, personal preferences and cross-project workflows go to user-level.
+
 ## Testing
 
 - No automated test suite. Validate scripts by running them with `bash -n <script>` for syntax checking.

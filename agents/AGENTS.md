@@ -15,6 +15,7 @@
 ## Workflow
 
 - Always use the `skill-creator` skill when creating or updating skills.
+- When asked to "add skills", create them in the `.agents/skills/` directory of the current repository.
 - Read files before modifying them. Understand existing code before suggesting changes.
 - For multi-step tasks, use a todo list to track progress.
 
