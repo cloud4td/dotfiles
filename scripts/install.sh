@@ -29,7 +29,7 @@ create_symlink() {
     ln -sf "$source" "$target"
 }
 
-# Link the entire Copilot memory directory to dotfiles/memories/
+# Link the entire Copilot memory directory to dotfiles/agents/memories/
 setup_memory() {
     echo ""
     echo "Setting up Copilot memory directory symlink..."
@@ -41,20 +41,20 @@ setup_memory() {
         mv "$target" "${target}.backup.$(date +%Y%m%d_%H%M%S)"
     fi
     if [ ! -L "$target" ]; then
-        ln -sf "$DOTFILES_DIR/memories" "$target"
-        echo "  Linked: $target -> $DOTFILES_DIR/memories"
+        ln -sf "$DOTFILES_DIR/agents/copilot/memories" "$target"
+        echo "  Linked: $target -> $DOTFILES_DIR/agents/copilot/memories"
     else
         echo "  Already linked: $target"
     fi
 }
 
-# Symlink Claude Code settings.json to dotfiles/claude/settings.json
+# Symlink Claude Code settings.json to dotfiles/agents/claude-settings.json
 setup_claude_code() {
     echo ""
     echo "Setting up Claude Code settings symlink..."
     local claude_dir="$HOME/.claude"
     local target="$claude_dir/settings.json"
-    local source="$DOTFILES_DIR/claude/settings.json"
+    local source="$DOTFILES_DIR/agents/claude/settings.json"
     mkdir -p "$claude_dir"
     if [ -f "$source" ]; then
         if [ -f "$target" ] && [ ! -L "$target" ]; then
@@ -68,7 +68,7 @@ setup_claude_code() {
             echo "  Already linked: $target"
         fi
     else
-        echo "  ⚠️  claude/settings.json not found in dotfiles, skipping"
+        echo "  ⚠️  agents/claude/settings.json not found in dotfiles, skipping"
     fi
 }
 
