@@ -4,7 +4,7 @@
     "args": ["notebooklm-mcp@latest"]
   },
   "mcp-atlassian": {
-    "command": "/opt/homebrew/bin/uvx",
+    "command": "uvx",
     "args": ["mcp-atlassian"],
     "env": {
       "JIRA_URL": "https://talkdesk.atlassian.net",
@@ -33,7 +33,7 @@
     ]
   },
   "google-workspace": {
-    "command": "/opt/homebrew/bin/uvx",
+    "command": "uvx",
     "args": ["workspace-mcp"],
     "env": {
       "GOOGLE_OAUTH_CLIENT_ID": "${GOOGLE_OAUTH_CLIENT_ID}",

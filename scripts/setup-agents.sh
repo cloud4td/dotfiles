@@ -21,6 +21,32 @@ COPILOT_MEMORY_PARENT="$VSCODE_USER_DIR/globalStorage/github.copilot-chat/memory
 echo "🤖 Setting up AI tools configuration..."
 
 # ============================================================
+# Homebrew PATH for GUI apps (ensures npx/uvx available to MCP)
+# ============================================================
+
+setup_homebrew_path() {
+    echo ""
+    echo "━━━ Homebrew PATH (GUI apps) ━━━"
+    local paths_file="/etc/paths.d/homebrew"
+    if [ -f "$paths_file" ] && grep -q "/opt/homebrew/bin" "$paths_file" 2>/dev/null; then
+        echo "   ✅ Already configured: $paths_file"
+        return
+    fi
+    echo "   MCP servers need Homebrew tools (npx, uvx) in PATH."
+    echo "   This adds /opt/homebrew/bin to the system PATH for GUI apps."
+    echo "   Requires sudo to write to $paths_file"
+    read -p "   Apply? (y/N): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo '/opt/homebrew/bin' | sudo tee "$paths_file" > /dev/null
+        echo '/opt/homebrew/sbin' | sudo tee -a "$paths_file" > /dev/null
+        echo "   ✅ Created $paths_file (restart VS Code/Claude to take effect)"
+    else
+        echo "   ⏭️  Skipped"
+    fi
+}
+
+# ============================================================
 # Helper: show diff between current and new content, ask to proceed
 # Usage: confirm_overwrite <current_file> <new_file_or_content> [label]
 # Returns 0 if user confirms, 1 if skipped
@@ -335,16 +361,18 @@ echo "  1) MCP servers only"
 echo "  2) Claude Code agent settings only"
 echo "  3) Copilot memory only"
 echo "  4) User-level instructions (AGENTS.md) only"
-echo "  5) All (default)"
-read -p "Choice [5]: " choice
-choice=${choice:-5}
+echo "  5) Homebrew PATH for GUI apps only"
+echo "  6) All (default)"
+read -p "Choice [6]: " choice
+choice=${choice:-6}
 
 case $choice in
     1) setup_mcp ;;
     2) setup_claude_code_settings ;;
     3) setup_copilot_memory ;;
     4) setup_user_instructions ;;
-    5) setup_mcp; setup_claude_code_settings; setup_copilot_memory; setup_user_instructions ;;
+    5) setup_homebrew_path ;;
+    6) setup_homebrew_path; setup_mcp; setup_claude_code_settings; setup_copilot_memory; setup_user_instructions ;;
     *) echo "❌ Invalid choice"; exit 1 ;;
 esac
 
