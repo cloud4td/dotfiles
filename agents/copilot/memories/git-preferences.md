@@ -1,0 +1,1 @@
+- User preference: use only GPG signing identity `li.jiang@talkdesk.com` with key `387D06587CA42333` for Git commits when configuring signing.

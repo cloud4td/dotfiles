@@ -1,0 +1,1 @@
+- Successful `git push` and `git push --force-with-lease` update the local tracking ref for the pushed branch in normal upstream setups; if local branch and `origin/<branch>` still differ immediately after, the push likely failed or never ran.
