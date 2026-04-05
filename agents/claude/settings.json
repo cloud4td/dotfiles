@@ -62,8 +62,6 @@
   "enabledPlugins": {
     "atlassian@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
-    "figma@claude-plugins-official": true,
-    "github@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
     "cli-anything@cli-anything": true,
     "compound-engineering@compound-engineering-plugin": true
@@ -82,5 +80,6 @@
       }
     }
   },
-  "effortLevel": "medium"
+  "effortLevel": "medium",
+  "skipDangerousModePermissionPrompt": true
 }
