@@ -1,43 +1,88 @@
 {
-  "notebooklm-mcp": {
-    "command": "npx",
-    "args": ["notebooklm-mcp@latest"]
-  },
-  "mcp-atlassian": {
-    "command": "uvx",
-    "args": ["mcp-atlassian"],
-    "env": {
-      "JIRA_URL": "https://talkdesk.atlassian.net",
-      "JIRA_USERNAME": "${ATLASSIAN_USER_EMAIL}",
-      "JIRA_API_TOKEN": "${ATLASSIAN_API_TOKEN}",
-      "CONFLUENCE_URL": "https://talkdesk.atlassian.net/wiki",
-      "CONFLUENCE_USERNAME": "${ATLASSIAN_USER_EMAIL}",
-      "CONFLUENCE_API_TOKEN": "${ATLASSIAN_API_TOKEN}"
+  "services": {
+    "mcp-atlassian": {
+      "command": "uvx",
+      "args": ["mcp-atlassian"],
+      "env": {
+        "JIRA_URL": "https://talkdesk.atlassian.net",
+        "JIRA_USERNAME": "${ATLASSIAN_USER_EMAIL}",
+        "JIRA_API_TOKEN": "${ATLASSIAN_API_TOKEN}",
+        "CONFLUENCE_URL": "https://talkdesk.atlassian.net/wiki",
+        "CONFLUENCE_USERNAME": "${ATLASSIAN_USER_EMAIL}",
+        "CONFLUENCE_API_TOKEN": "${ATLASSIAN_API_TOKEN}"
+      },
+      "autoStart": false
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "autoStart": false
+    },
+    "talkdesk-developer-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "--registry",
+        "https://hub.talkdeskapp.com:8443/repository/talkdesk-npm",
+        "--prefer-offline",
+        "@talkdesk/developer-mcp@latest"
+      ],
+      "autoStart": false
+    },
+    "google-workspace": {
+      "command": "uvx",
+      "args": ["workspace-mcp"],
+      "env": {
+        "GOOGLE_OAUTH_CLIENT_ID": "${GOOGLE_OAUTH_CLIENT_ID}",
+        "GOOGLE_OAUTH_CLIENT_SECRET": "${GOOGLE_OAUTH_CLIENT_SECRET}"
+      },
+      "autoStart": false
     }
   },
-  "github": {
-    "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-github"],
-    "env": {
-      "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-    }
-  },
-  "talkdesk-developer-mcp": {
-    "command": "npx",
-    "args": [
-      "-y",
-      "--registry",
-      "https://hub.talkdeskapp.com:8443/repository/talkdesk-npm",
-      "--prefer-offline",
-      "@talkdesk/developer-mcp@latest"
-    ]
-  },
-  "google-workspace": {
-    "command": "uvx",
-    "args": ["workspace-mcp"],
-    "env": {
-      "GOOGLE_OAUTH_CLIENT_ID": "${GOOGLE_OAUTH_CLIENT_ID}",
-      "GOOGLE_OAUTH_CLIENT_SECRET": "${GOOGLE_OAUTH_CLIENT_SECRET}"
+  "mcpServices": {
+    "mcp-atlassian": {
+      "command": "uvx",
+      "args": ["mcp-atlassian"],
+      "env": {
+        "JIRA_URL": "https://talkdesk.atlassian.net",
+        "JIRA_USERNAME": "${ATLASSIAN_USER_EMAIL}",
+        "JIRA_API_TOKEN": "${ATLASSIAN_API_TOKEN}",
+        "CONFLUENCE_URL": "https://talkdesk.atlassian.net/wiki",
+        "CONFLUENCE_USERNAME": "${ATLASSIAN_USER_EMAIL}",
+        "CONFLUENCE_API_TOKEN": "${ATLASSIAN_API_TOKEN}"
+      },
+      "autoStart": false
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "autoStart": false
+    },
+    "talkdesk-developer-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "--registry",
+        "https://hub.talkdeskapp.com:8443/repository/talkdesk-npm",
+        "--prefer-offline",
+        "@talkdesk/developer-mcp@latest"
+      ],
+      "autoStart": false
+    },
+    "google-workspace": {
+      "command": "uvx",
+      "args": ["workspace-mcp"],
+      "env": {
+        "GOOGLE_OAUTH_CLIENT_ID": "${GOOGLE_OAUTH_CLIENT_ID}",
+        "GOOGLE_OAUTH_CLIENT_SECRET": "${GOOGLE_OAUTH_CLIENT_SECRET}"
+      },
+      "autoStart": false
     }
   }
 }

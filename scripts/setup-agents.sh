@@ -11,7 +11,6 @@ MCP_TEMPLATE="$DOTFILES_DIR/agents/mcp.json.example"
 # Target locations
 VSCODE_USER_DIR="$HOME/Library/Application Support/Code/User"
 VSCODE_MCP_TARGET="$VSCODE_USER_DIR/mcp.json"
-CLAUDE_CODE_CONFIG="$HOME/.claude.json"
 CLAUDE_CODE_DIR="$HOME/.claude"
 CLAUDE_CODE_SETTINGS="$CLAUDE_CODE_DIR/settings.json"
 CLAUDE_DESKTOP_DIR="$HOME/Library/Application Support/Claude"
@@ -143,27 +142,7 @@ setup_mcp() {
         echo "   ✅ VS Code mcp.json created"
     fi
 
-    # --- Claude Code ---
-    echo ""
-    echo "📦 Claude Code MCP..."
-    if [ -f "$CLAUDE_CODE_CONFIG" ]; then
-        local new_claude
-        new_claude=$(jq --argjson servers "$SERVERS" '.mcpServers = $servers' "$CLAUDE_CODE_CONFIG")
-        local tmpfile2
-        tmpfile2=$(mktemp)
-        echo "$new_claude" > "$tmpfile2"
-        if show_diff_and_confirm "$CLAUDE_CODE_CONFIG" "$tmpfile2" "~/.claude.json"; then
-            cp "$CLAUDE_CODE_CONFIG" "$CLAUDE_CODE_CONFIG.backup.$(date +%Y%m%d_%H%M%S)"
-            mv "$tmpfile2" "$CLAUDE_CODE_CONFIG"
-            echo "   ✅ ~/.claude.json updated"
-        else
-            rm -f "$tmpfile2"
-            echo "   ⏭️  Skipped"
-        fi
-    else
-        jq -n --argjson servers "$SERVERS" '{"mcpServers": $servers}' > "$CLAUDE_CODE_CONFIG"
-        echo "   ✅ ~/.claude.json created"
-    fi
+    # Claude Code MCP is managed via ~/.claude/settings.json (symlinked in setup_claude_code_settings)
 
     # --- Claude Desktop ---
     echo ""
@@ -389,8 +368,7 @@ echo "   VS Code MCP:           ~/Library/Application Support/Code/User/mcp.json
 echo "   VS Code settings:      ~/Library/Application Support/Code/User/settings.json (symlink)"
 echo "   Copilot instructions:  ~/Library/Application Support/Code/User/prompts/user.instructions.md (symlink)"
 echo "   Copilot memory:        dotfiles/agents/copilot/memories/ (symlink)"
-echo "   Claude Code MCP:       ~/.claude.json"
-echo "   Claude Code settings:  ~/.claude/settings.json (symlink)"
+echo "   Claude Code settings:  ~/.claude/settings.json (symlink, includes MCP)"
 echo "   Claude Code instructions: ~/.claude.md (symlink)"
 echo "   Claude Desktop:        ~/Library/Application Support/Claude/claude_desktop_config.json"
 echo "   Source of truth:       dotfiles/agents/AGENTS.md"
