@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Editors — JetBrains
+.idea
+
+# Editors — Vim
+*.swp
+*.swo
+*~
+
+# AI Tools — Claude Code
+.claude/settings.local.json
+
+# AI Tools — Cursor
+.cursorindexingignore
+
+# AI Tools — Aider
+.aider*
+
+# Environment
+.env.local

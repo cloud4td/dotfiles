@@ -116,6 +116,12 @@ if [ ! -L "$HOME/dotfiles" ] && [ "$DOTFILES_DIR" != "$HOME/dotfiles" ]; then
     ln -sf "$DOTFILES_DIR" "$HOME/dotfiles"
 fi
 
+# Symlink global gitignore
+echo ""
+echo "Setting up global gitignore..."
+create_symlink "$DOTFILES_DIR/git/gitignore_global" "$HOME/.gitignore_global"
+git config --global core.excludesFile "$HOME/.gitignore_global"
+
 # Symlink Copilot memory directory
 setup_memory
 
