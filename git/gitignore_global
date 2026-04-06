@@ -18,6 +18,7 @@ _.swo
 # AI Tools — Claude Code
 
 .claude/settings.local.json
+.claude/worktrees/*
 
 # AI Tools — Cursor
 

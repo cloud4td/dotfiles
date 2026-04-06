@@ -159,6 +159,15 @@
     "editor.defaultFormatter": "foxundermoon.shell-format"
   },
 
+  // File associations — gitignore files (no extension) must not be formatted by Prettier
+  "files.associations": {
+    "*gitignore*": "ignore",
+    "*.gitignore": "ignore"
+  },
+  "[ignore]": {
+    "editor.formatOnSave": false
+  },
+
   // Prettier
   "prettier.semi": true,
   "prettier.singleQuote": true,
