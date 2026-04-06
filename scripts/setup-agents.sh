@@ -114,9 +114,10 @@ setup_mcp() {
         return 1
     fi
 
-    # Read server definitions from template
-    local SERVERS
-    SERVERS=$(cat "$MCP_TEMPLATE")
+    # Read server definitions from template (services → Copilot, mcpServices → Claude)
+    local COPILOT_SERVERS CLAUDE_SERVERS
+    COPILOT_SERVERS=$(jq '.services' "$MCP_TEMPLATE")
+    CLAUDE_SERVERS=$(jq '.mcpServices' "$MCP_TEMPLATE")
 
     # --- VS Code ---
     echo ""
@@ -125,7 +126,7 @@ setup_mcp() {
     if [ -f "$VSCODE_MCP_TARGET" ]; then
         echo "   ⚠️  mcp.json already exists"
         local new_content
-        new_content=$(jq -n --argjson servers "$SERVERS" '{"servers": $servers, "inputs": []}')
+        new_content=$(jq -n --argjson servers "$COPILOT_SERVERS" '{"servers": $servers, "inputs": []}')
         local tmpfile
         tmpfile=$(mktemp)
         echo "$new_content" > "$tmpfile"
@@ -138,7 +139,7 @@ setup_mcp() {
             echo "   ⏭️  Skipped"
         fi
     else
-        jq -n --argjson servers "$SERVERS" '{"servers": $servers, "inputs": []}' > "$VSCODE_MCP_TARGET"
+        jq -n --argjson servers "$COPILOT_SERVERS" '{"servers": $servers, "inputs": []}' > "$VSCODE_MCP_TARGET"
         echo "   ✅ VS Code mcp.json created"
     fi
 
@@ -150,7 +151,7 @@ setup_mcp() {
     mkdir -p "$CLAUDE_DESKTOP_DIR"
     if [ -f "$CLAUDE_DESKTOP_CONFIG" ]; then
         local new_desktop
-        new_desktop=$(jq --argjson servers "$SERVERS" '.mcpServers = $servers' "$CLAUDE_DESKTOP_CONFIG")
+        new_desktop=$(jq --argjson servers "$CLAUDE_SERVERS" '.mcpServers = $servers' "$CLAUDE_DESKTOP_CONFIG")
         local tmpfile3
         tmpfile3=$(mktemp)
         echo "$new_desktop" > "$tmpfile3"
@@ -163,7 +164,7 @@ setup_mcp() {
             echo "   ⏭️  Skipped"
         fi
     else
-        jq -n --argjson servers "$SERVERS" '{"mcpServers": $servers}' > "$CLAUDE_DESKTOP_CONFIG"
+        jq -n --argjson servers "$CLAUDE_SERVERS" '{"mcpServers": $servers}' > "$CLAUDE_DESKTOP_CONFIG"
         echo "   ✅ Claude Desktop config created"
     fi
 }
