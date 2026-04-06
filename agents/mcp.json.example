@@ -40,6 +40,13 @@
         "GOOGLE_OAUTH_CLIENT_SECRET": "${GOOGLE_OAUTH_CLIENT_SECRET}"
       },
       "autoStart": false
+    },
+    "designmd": {
+      "command": "npx",
+      "args": ["designmd-mcp"],
+      "env": {
+        "DESIGNMD_API_KEY": "${DESIGNMD_API_KEY}"
+      }
     }
   },
   "mcpServices": {
@@ -83,6 +90,13 @@
         "GOOGLE_OAUTH_CLIENT_SECRET": "${GOOGLE_OAUTH_CLIENT_SECRET}"
       },
       "autoStart": false
+    },
+    "designmd": {
+      "command": "npx",
+      "args": ["designmd-mcp"],
+      "env": {
+        "DESIGNMD_API_KEY": "${DESIGNMD_API_KEY}"
+      }
     }
   }
 }
