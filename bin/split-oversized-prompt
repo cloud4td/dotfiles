@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+"""
+Split a code2prompt output file into parts if it exceeds the word limit.
+
+NotebookLM enforces a 500,000-word limit per source (standard wc -w counting).
+This script splits at file-section boundaries (lines matching `filename`:)
+so each part stays under the limit while keeping logical units intact.
+
+Usage: split-oversized-prompt <file> [max_words]
+  - If the file is under the limit, prints a status line and exits.
+  - If over the limit, writes partN files and removes the original.
+
+Exit codes:
+  0 = no split needed (file within limit)
+  1 = error
+  10 = split performed successfully
+"""
+
+import re
+import os
+import sys
+
+
+MAX_WORDS_DEFAULT = 480_000  # Safety margin below NotebookLM's 500K limit
+
+# Section header pattern: lines like `src/main.tsx`:
+SECTION_PAT = re.compile(r'^`[A-Za-z_./].*`:\s*$')
+
+
+def count_words_wc(text: str) -> int:
+    """Count words the same way wc -w does: split on whitespace."""
+    return len(text.split())
+
+
+def main():
+    if len(sys.argv) < 2:
+        print(f"Usage: {sys.argv[0]} <file> [max_words]", file=sys.stderr)
+        sys.exit(1)
+
+    file_path = sys.argv[1]
+    max_words = int(sys.argv[2]) if len(sys.argv) > 2 else MAX_WORDS_DEFAULT
+
+    if not os.path.isfile(file_path):
+        print(f"    ⚠️  File not found: {file_path}", file=sys.stderr)
+        sys.exit(1)
+
+    with open(file_path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    total_words = count_words_wc(''.join(lines))
+
+    if total_words <= max_words:
+        print(f'    📏 {total_words:,} words — within limit ({max_words:,}), no split needed')
+        sys.exit(0)
+
+    total_lines = len(lines)
+
+    # Find section boundaries
+    section_starts = [i for i, line in enumerate(lines) if SECTION_PAT.match(line)]
+
+    if not section_starts:
+        print(f'    ⚠️  {total_words:,} words exceeds {max_words:,} but no section markers found — cannot split')
+        sys.exit(1)
+
+    # Header = everything before the first section
+    header_end = section_starts[0]
+    header_lines = lines[:header_end]
+    header_words = count_words_wc(''.join(header_lines))
+
+    # Build sections list with word counts
+    sections = []
+    for i, start in enumerate(section_starts):
+        end = section_starts[i + 1] if i + 1 < len(section_starts) else total_lines
+        sec_text = ''.join(lines[start:end])
+        sections.append({
+            'start': start,
+            'end': end,
+            'words': count_words_wc(sec_text),
+            'name': lines[start].strip(),
+        })
+
+    # Partition sections into parts — each part includes the header
+    # so effective budget per part = max_words - header_words
+    budget = max_words - header_words
+    if budget <= 0:
+        print(f'    ⚠️  Header alone is {header_words:,} words, exceeds limit {max_words:,}')
+        sys.exit(1)
+
+    parts = []
+    cur_start_idx = 0
+    cur_words = 0
+
+    for i, sec in enumerate(sections):
+        if cur_words + sec['words'] > budget and i > cur_start_idx:
+            # Close current part
+            parts.append((cur_start_idx, i, cur_words + header_words))
+            cur_start_idx = i
+            cur_words = sec['words']
+        else:
+            cur_words += sec['words']
+
+    # Last part
+    parts.append((cur_start_idx, len(sections), cur_words + header_words))
+
+    # Write part files
+    base, ext = os.path.splitext(file_path)
+    num_parts = len(parts)
+    base_name = os.path.basename(base)
+
+    print(f'    ✂️  {total_words:,} words → splitting into {num_parts} parts (limit: {max_words:,})')
+
+    for idx, (sec_start, sec_end, est_words) in enumerate(parts, 1):
+        part_path = f'{base}-part{idx}{ext}'
+        first_line = sections[sec_start]['start']
+        last_line = sections[sec_end - 1]['end']
+        part_lines = lines[first_line:last_line]
+
+        banner = f'[Part {idx}/{num_parts}] {base_name}\n'
+        banner += f'Sections: {sections[sec_start]["name"]}  ...  {sections[sec_end - 1]["name"]}\n\n'
+
+        content = banner + ''.join(header_lines) + ''.join(part_lines)
+        actual_words = count_words_wc(content)
+
+        with open(part_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+        print(f'      {os.path.basename(part_path)}: {actual_words:,} words, {len(part_lines):,} lines')
+
+    # Remove the oversized original
+    os.remove(file_path)
+    print(f'    🗑️  Removed oversized original: {os.path.basename(file_path)}')
+    sys.exit(10)
+
+
+if __name__ == '__main__':
+    main()

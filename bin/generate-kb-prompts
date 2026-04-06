@@ -17,6 +17,10 @@ EXCLUDE="node_modules/,dist/,build/,target/,bin/,obj/,out/,.git/,.vscode/,.idea/
 # Maximum allowed line length in output (chars). Lines exceeding this are truncated.
 MAX_LINE_LEN=5000
 
+# Maximum words per file (wc -w). Files exceeding this are auto-split.
+# NotebookLM limit is 500,000 words; we use 480K for safety margin.
+MAX_WORDS=480000
+
 # Output directory
 OUTPUT_DIR="prompts"
 
@@ -74,6 +78,17 @@ strip_bloat_lines() {
     fi
 }
 
+# ── Auto-split: break oversized files into parts under MAX_WORDS ─────────────
+# Calls the companion split-oversized-prompt script which uses wc-w word counting
+# to match NotebookLM's 500K word limit. Splits at section boundaries.
+split_if_oversized() {
+    local file="$1"
+    [ -f "$file" ] || return 0
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    python3 "${script_dir}/split-oversized-prompt" "$file" "$MAX_WORDS"
+}
+
 # Parse command line arguments
 show_help() {
     echo "Usage: $0 [OPTIONS] [TARGET]"
@@ -87,6 +102,7 @@ show_help() {
     echo "  -o, --output DIR         Output directory (default: prompts)"
     echo "  -q, --quiet              Suppress progress messages"
     echo "  -n, --no-strip           Skip post-processing (keep source maps & long lines)"
+    echo "  -w, --max-words NUM      Max words per file before auto-split (default: 480000)"
     echo "  -h, --help               Show this help message"
     echo ""
     echo "TARGET:"
@@ -143,6 +159,10 @@ while [[ $# -gt 0 ]]; do
             STRIP_BLOAT=false
             shift
             ;;
+        -w|--max-words)
+            MAX_WORDS="$2"
+            shift 2
+            ;;
         -h|--help)
             show_help
             exit 0
@@ -192,6 +212,7 @@ generate_root() {
     if [ "$STRIP_BLOAT" = true ]; then
         strip_bloat_lines "$OUTPUT_DIR/prompt-root.txt"
     fi
+    split_if_oversized "$OUTPUT_DIR/prompt-root.txt"
     echo "✅ Generated: $OUTPUT_DIR/prompt-root.txt"
 }
 
@@ -207,6 +228,7 @@ generate_repo() {
         if [ "$STRIP_BLOAT" = true ]; then
             strip_bloat_lines "$OUTPUT_DIR/prompt-${repo_name}.txt"
         fi
+        split_if_oversized "$OUTPUT_DIR/prompt-${repo_name}.txt"
         echo "✅ Generated: $OUTPUT_DIR/prompt-${repo_name}.txt"
     else
         echo "❌ Error: Repository 'repos/$repo_name' not found"
@@ -236,6 +258,7 @@ generate_all() {
             if [ "$STRIP_BLOAT" = true ]; then
                 strip_bloat_lines "$OUTPUT_DIR/prompt-${repo_name}.txt"
             fi
+            split_if_oversized "$OUTPUT_DIR/prompt-${repo_name}.txt"
         fi
     done
 
