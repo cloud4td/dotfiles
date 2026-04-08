@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+set -e
+
+# Copilot API Proxy — starts the GitHub Copilot compatible proxy server
+# Exposes OpenAI and Anthropic compatible endpoints on localhost
+# Project: https://github.com/sunfulin123/copilot-api-proxy
+
+DEFAULT_PORT=4141
+DEFAULT_ACCOUNT_TYPE="business"
+
+print_usage() {
+  cat << EOF
+Usage: copilot-proxy [OPTIONS]
+
+Start the GitHub Copilot API proxy server exposing OpenAI & Anthropic compatible endpoints.
+
+Options:
+  -p, --port <PORT>           Port to listen on (default: $DEFAULT_PORT)
+  -a, --account-type <TYPE>   Account type: individual, business, enterprise (default: $DEFAULT_ACCOUNT_TYPE)
+  -r, --rate-limit <SEC>      Rate limit in seconds between requests
+  -w, --wait                  Wait instead of error when rate limit is hit
+  -v, --verbose               Enable verbose logging
+  --show-token                Show GitHub and Copilot tokens on fetch and refresh
+  --manual                    Enable manual request approval
+  --claude-code               Generate Claude Code launch command
+  --auth                      Run GitHub authentication flow only (no server)
+  --check-usage               Show current Copilot usage and quota
+  --debug                     Display diagnostic info
+  -h, --help                  Show this help message
+
+Examples:
+  # Start proxy with default settings (business account, port 4141)
+  copilot-proxy
+
+  # Start on custom port with rate limiting
+  copilot-proxy -p 8080 -r 30 -w
+
+  # Individual account with verbose logging
+  copilot-proxy -a individual -v
+
+  # Just authenticate (no server)
+  copilot-proxy --auth
+
+  # Check usage quota
+  copilot-proxy --check-usage
+
+Endpoints (after start):
+  POST http://localhost:<PORT>/v1/chat/completions   (OpenAI compatible)
+  POST http://localhost:<PORT>/v1/messages            (Anthropic compatible)
+  GET  http://localhost:<PORT>/v1/models              (List models)
+  GET  http://localhost:<PORT>/usage                  (Usage dashboard)
+EOF
+}
+
+# Ensure npx is available
+if ! command -v npx &>/dev/null; then
+  echo "Error: npx is not installed. Install Node.js first." >&2
+  exit 1
+fi
+
+# Parse arguments
+PORT="$DEFAULT_PORT"
+ACCOUNT_TYPE="$DEFAULT_ACCOUNT_TYPE"
+EXTRA_ARGS=()
+SUBCOMMAND="start"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      print_usage
+      exit 0
+      ;;
+    -p|--port)
+      PORT="$2"
+      shift 2
+      ;;
+    -a|--account-type)
+      ACCOUNT_TYPE="$2"
+      shift 2
+      ;;
+    -r|--rate-limit)
+      EXTRA_ARGS+=("--rate-limit" "$2")
+      shift 2
+      ;;
+    -w|--wait)
+      EXTRA_ARGS+=("--wait")
+      shift
+      ;;
+    -v|--verbose)
+      EXTRA_ARGS+=("--verbose")
+      shift
+      ;;
+    --show-token)
+      EXTRA_ARGS+=("--show-token")
+      shift
+      ;;
+    --manual)
+      EXTRA_ARGS+=("--manual")
+      shift
+      ;;
+    --claude-code)
+      EXTRA_ARGS+=("--claude-code")
+      shift
+      ;;
+    --auth)
+      SUBCOMMAND="auth"
+      shift
+      ;;
+    --check-usage)
+      SUBCOMMAND="check-usage"
+      shift
+      ;;
+    --debug)
+      SUBCOMMAND="debug"
+      shift
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      print_usage
+      exit 1
+      ;;
+  esac
+done
+
+# Build command
+CMD=(npx @franklin-ai/copilot-compat-proxy@latest "$SUBCOMMAND")
+
+if [[ "$SUBCOMMAND" == "start" ]]; then
+  CMD+=("--port" "$PORT" "--account-type" "$ACCOUNT_TYPE")
+fi
+
+CMD+=("${EXTRA_ARGS[@]}")
+
+echo "Starting copilot proxy: ${CMD[*]}"
+exec "${CMD[@]}"
