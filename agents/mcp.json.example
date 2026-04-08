@@ -47,6 +47,10 @@
       "env": {
         "DESIGNMD_API_KEY": "${DESIGNMD_API_KEY}"
       }
+    },
+    "figma": {
+      "url": "https://mcp.figma.com/mcp",
+      "type": "http"
     }
   },
   "mcpServices": {
