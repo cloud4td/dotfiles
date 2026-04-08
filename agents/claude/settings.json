@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_ENV_FILE": "/Users/cloud/dotfiles/zsh/env.zsh"
+  },
   "permissions": {
     "allow": [
       "Bash(git *)",
