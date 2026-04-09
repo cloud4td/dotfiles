@@ -1,52 +1,56 @@
 #!/usr/bin/env bash
-# Setup fnm (Fast Node Manager) and install Node.js
-# This script installs fnm if not present and configures Node.js
+# Setup nvm (Node Version Manager) and install Node.js
+# This script installs nvm if not present and configures Node.js
 
 set -e
 
-echo "🚀 Setting up fnm for Node.js version management..."
+echo "🚀 Setting up nvm for Node.js version management..."
 
-# Check if fnm is already installed
-if command -v fnm &> /dev/null; then
-    echo "✅ fnm is already installed ($(fnm --version))"
+export NVM_DIR="$HOME/.nvm"
+
+# Check if nvm is already installed
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+    source "$NVM_DIR/nvm.sh"
+    echo "✅ nvm is already installed ($(nvm --version))"
 else
-    echo "📦 Installing fnm via Homebrew..."
-    if command -v brew &> /dev/null; then
-        brew install fnm
-        echo "✅ fnm installed successfully!"
-    else
-        echo "❌ Homebrew not found. Please install Homebrew first:"
-        echo "   /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
-        exit 1
-    fi
+    echo "📦 Installing nvm via install script..."
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+    source "$NVM_DIR/nvm.sh"
+    echo "✅ nvm installed successfully!"
 fi
 
-# Initialize fnm for current shell
-eval "$(fnm env --use-on-cd)"
-
 echo ""
-echo "📋 Checking Node.js version from .node-version..."
+echo "📋 Checking Node.js version from .node-version / .nvmrc..."
 
-# Determine Node.js version from .node-version file
+# Determine Node.js version from .node-version or .nvmrc file
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-if [ -f "$DOTFILES_DIR/.node-version" ]; then
+if [ -f "$DOTFILES_DIR/.nvmrc" ]; then
+    echo "📋 Node.js version from .nvmrc:"
+    cat "$DOTFILES_DIR/.nvmrc"
+
+    echo ""
+    echo "📦 Installing Node.js via nvm..."
+    cd "$DOTFILES_DIR"
+    nvm install
+
+    echo ""
+    echo "✅ Node.js installed and configured"
+elif [ -f "$DOTFILES_DIR/.node-version" ]; then
     echo "📋 Node.js version from .node-version:"
     cat "$DOTFILES_DIR/.node-version"
-    
-    # Install Node.js version via fnm (automatically reads .node-version)
+
     echo ""
-    echo "📦 Installing Node.js via fnm..."
+    echo "📦 Installing Node.js via nvm..."
     cd "$DOTFILES_DIR"
-    fnm install
-    
+    nvm install "$(cat .node-version)"
+
     echo ""
     echo "✅ Node.js installed and configured"
 else
-    echo "⚠️  No .node-version file found, installing LTS..."
-    fnm install --lts
-    fnm use lts-latest
-    fnm default lts-latest
+    echo "⚠️  No .nvmrc or .node-version file found, installing LTS..."
+    nvm install --lts
+    nvm alias default lts/*
     echo "✅ Node.js LTS installed successfully!"
 fi
 
@@ -66,7 +70,7 @@ echo ""
 if command -v corepack &> /dev/null; then
     echo "🔧 Enabling Corepack for Yarn and pnpm..."
     corepack enable
-    
+
     # Install Yarn via Corepack
     if ! command -v yarn &> /dev/null; then
         echo "📦 Installing Yarn via Corepack..."
@@ -75,7 +79,7 @@ if command -v corepack &> /dev/null; then
     else
         echo "✅ Yarn is already available: $(yarn --version)"
     fi
-    
+
     # Install pnpm via Corepack
     if ! command -v pnpm &> /dev/null; then
         echo "📦 Installing pnpm via Corepack..."
@@ -86,7 +90,7 @@ if command -v corepack &> /dev/null; then
     fi
 else
     echo "⚠️  Corepack not available (requires Node.js 16.10+)"
-    
+
     # Fallback to npm global install
     if ! command -v yarn &> /dev/null; then
         read -p "Install Yarn globally via npm? (Y/n) " -n 1 -r
@@ -98,7 +102,7 @@ else
     else
         echo "✅ Yarn is already available: $(yarn --version)"
     fi
-    
+
     if ! command -v pnpm &> /dev/null; then
         read -p "Install pnpm globally via npm? (Y/n) " -n 1 -r
         echo
@@ -127,18 +131,30 @@ if brew list 2>/dev/null | grep -qE '^node(@[0-9]+)?$'; then
     fi
 fi
 
+# Check if fnm is still installed and offer to remove it
+if command -v fnm &> /dev/null; then
+    echo ""
+    echo "⚠️  fnm is still installed."
+    read -p "Remove fnm via Homebrew? (y/N) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        brew uninstall fnm 2>/dev/null || true
+        echo "✅ fnm removed"
+    fi
+fi
+
 echo ""
-echo "✅ fnm setup complete!"
+echo "✅ nvm setup complete!"
 echo ""
 echo "📚 Quick Reference:"
 echo ""
 echo "   Node.js Version Management:"
-echo "      fnm list                 # List installed Node.js versions"
-echo "      fnm install 20           # Install Node.js 20"
-echo "      fnm install              # Install version from .node-version"
-echo "      fnm use 20               # Switch to Node.js 20"
-echo "      fnm default 24           # Set Node.js 24 as default"
-echo "      fnm install --lts        # Install latest LTS"
+echo "      nvm ls                   # List installed Node.js versions"
+echo "      nvm install 20           # Install Node.js 20"
+echo "      nvm install              # Install version from .nvmrc"
+echo "      nvm use 20               # Switch to Node.js 20"
+echo "      nvm alias default 24     # Set Node.js 24 as default"
+echo "      nvm install --lts        # Install latest LTS"
 echo ""
 echo "   Package Managers:"
 echo "      npm install <package>    # Install with npm"
@@ -146,6 +162,5 @@ echo "      yarn add <package>       # Install with Yarn"
 echo "      pnpm add <package>       # Install with pnpm"
 echo "      corepack enable          # Enable Yarn/pnpm via Corepack"
 echo ""
-echo "💡 Tip: Create .node-version file in your project to auto-switch versions"
-echo "   Example: echo \"20\" > .node-version"
-echo ""
+echo "💡 Tip: Create .nvmrc file in your project to pin versions"
+echo "   Example: echo \"20\" > .nvmrc"

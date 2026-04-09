@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Setup .NET SDK with version management (similar to fnm, uv, sdkman)
+# Setup .NET SDK with version management (similar to nvm, uv, sdkman)
 # This script installs dotnet-install script for managing multiple .NET versions
 
 set -e

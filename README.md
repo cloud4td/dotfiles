@@ -33,7 +33,7 @@ dotfiles/
 │   ├── setup-vscode.sh    # VS Code configuration setup
 │   ├── setup-agents.sh        # AI tools setup (MCP, Claude Code, Copilot memory)
 │   ├── setup-tools.sh     # Common CLI tools installation
-│   ├── setup-fnm.sh       # Node.js version manager setup
+│   ├── setup-nvm.sh       # Node.js version manager setup
 │   ├── setup-python.sh    # Python environment setup (uv + Poetry)
 │   ├── setup-sdkman.sh    # Java/JVM tools manager setup
 │   ├── setup-dotnet.sh    # .NET SDK setup
@@ -201,7 +201,7 @@ source ~/.zshrc
 
 ### Development Tools (installed via setup scripts)
 
-- **Node.js**: fnm (Fast Node Manager)
+- **Node.js**: nvm (Node Version Manager)
 - **Python**: uv + Poetry
 - **Java/JVM**: SDKMAN (manages Java, Maven, Gradle, Kotlin, Scala)
 - **.NET**: .NET SDK (supports multiple versions via global.json)
@@ -213,7 +213,7 @@ source ~/.zshrc
 
 ```bash
 # Run individual setup scripts
-./scripts/setup-fnm.sh      # Install Node.js via fnm
+./scripts/setup-nvm.sh      # Install Node.js via nvm
 ./scripts/setup-python.sh   # Install Python via uv
 ./scripts/setup-sdkman.sh   # Install Java/JVM via SDKMAN
 ./scripts/setup-dotnet.sh   # Install .NET SDK
@@ -228,20 +228,21 @@ This dotfiles configuration supports automatic version switching for multiple la
 
 | Tool | Version File | Auto-Switch | How It Works |
 |------|-------------|-------------|--------------|
-| **fnm** (Node.js) | `.node-version` / `.nvmrc` | ✅ Yes | Automatic via `fnm env --use-on-cd` |
+| **nvm** (Node.js) | `.nvmrc` / `.node-version` | ✅ Yes | Via `nvm use` / `nenv` helper |
 | **SDKMAN** (Java/JVM) | `.sdkmanrc` | ✅ Yes | Automatic via `sdkman_auto_env=true` |
 | **uv** (Python) | `.python-version` | ⚠️ Command-level | Auto-detected by `uv` commands |
 | **.NET** | `global.json` | ⚠️ Command-level | Auto-detected by `dotnet` commands |
 
 ### How Auto-Switching Works
 
-**fnm (Node.js)**
+**nvm (Node.js)**
 ```bash
 # Create version file
-echo "20.10.0" > .node-version
+echo "20.10.0" > .nvmrc
 
-# fnm automatically switches when you cd into the directory
-cd myproject  # Node.js version switches automatically
+# Switch manually with nenv helper
+cd myproject
+nenv  # Reads .nvmrc and switches Node.js version
 ```
 
 **SDKMAN (Java/JVM)**
@@ -280,7 +281,7 @@ dotnet build  # Uses .NET 8.0.300
 
 ### Configuration Details
 
-- **fnm**: Enabled in [zsh/env.zsh](zsh/env.zsh) via `eval "$(fnm env --use-on-cd)"`
+- **nvm**: Loaded in [zsh/env.zsh](zsh/env.zsh) via `source "$NVM_DIR/nvm.sh"`, switch with `nenv`
 - **SDKMAN**: Enabled during setup in [scripts/setup-sdkman.sh](scripts/setup-sdkman.sh) via `sdk config sdkman_auto_env true`
 - **uv**: Implicit detection, no shell hook required
 - **.NET**: Implicit detection via `global.json`

@@ -11,7 +11,7 @@ echo "🔧 Setting up tdev (Talkdesk Developer CLI)..."
 
 # Check prerequisites
 if ! command -v node &> /dev/null; then
-    echo "❌ Node.js is required. Install it first (setup-fnm.sh)"
+    echo "❌ Node.js is required. Install it first (setup-nvm.sh)"
     exit 1
 fi
 

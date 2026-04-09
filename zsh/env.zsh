@@ -18,8 +18,9 @@ export PATH="$HOME/dotfiles/bin:$PATH"
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
-# Node.js (fnm - no auto-switch, use `nenv` to switch manually)
-eval "$(fnm env)"
+# Node.js (nvm - no auto-switch, use `nenv` to switch manually)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
 
 # Python
 # uv manages Python versions (installed: 3.12, 3.13)
@@ -39,7 +40,7 @@ export DOCKER_HOST="unix:///var/run/docker.sock"
 export PATH="$PATH:$HOME/.docker/bin"
 export PATH="/usr/local/sbin:$PATH"
 
-# .NET (managed via dotnet-install script, similar to fnm/uv/sdkman)
+# .NET (managed via dotnet-install script, similar to nvm/uv/sdkman)
 export DOTNET_ROOT="$HOME/.dotnet"
 export PATH="$DOTNET_ROOT:$PATH"
 # Disable telemetry for privacy
