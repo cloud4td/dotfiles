@@ -38,14 +38,14 @@ function senv() {
 #        nenv 20.11.0  (switch to specific version)
 function nenv() {
     if [[ -n "$1" ]]; then
-        nvm install "$1" && nvm use "$1"
+        fnm use "$1" --install-if-missing
     else
         # Look for version file
-        if [[ -f ".nvmrc" || -f ".node-version" ]]; then
-            nvm install && nvm use
+        if [[ -f ".node-version" || -f ".nvmrc" ]]; then
+            fnm use --install-if-missing
         else
-            echo "No .nvmrc or .node-version found. Usage: nenv <version>"
-            nvm ls
+            echo "No .node-version or .nvmrc found. Usage: nenv <version>"
+            fnm list
             return 1
         fi
     fi

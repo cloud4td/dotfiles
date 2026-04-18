@@ -18,9 +18,7 @@ export PATH="$HOME/dotfiles/bin:$PATH"
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
-# Node.js (nvm - no auto-switch, use `nenv` to switch manually)
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+# Node.js (fnm - loaded in .zshrc via `eval "$(fnm env)"`, use `nenv` to switch manually)
 
 # Python
 # uv manages Python versions (installed: 3.12, 3.13)
