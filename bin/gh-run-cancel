@@ -1,0 +1,88 @@
+#!/bin/zsh
+
+# Force cancel a GitHub Actions workflow run
+# Usage: gh-run-cancel <RUN_URL_OR_ID> [--repo <REPO>]
+
+print_usage() {
+  cat << EOF
+Usage: gh-run-cancel <RUN_URL_OR_ID> [OPTIONS]
+
+Force cancel a GitHub Actions workflow run using the GitHub API.
+
+Arguments:
+  <RUN_URL_OR_ID>       Full run URL or numeric run ID
+
+Options:
+  --repo <REPO>         Repository in owner/repo format (required if using numeric ID)
+
+Examples:
+  # Cancel by URL
+  gh-run-cancel https://github.com/Talkdesk/confucius/actions/runs/24599502338
+
+  # Cancel by URL (with job suffix — job ID is ignored, run ID is extracted)
+  gh-run-cancel https://github.com/Talkdesk/confucius/actions/runs/24599502338/job/71941426358
+
+  # Cancel by run ID
+  gh-run-cancel 24599502338 --repo Talkdesk/confucius
+EOF
+}
+
+if [[ -z "$1" || "$1" == "--help" || "$1" == "-h" ]]; then
+  print_usage
+  exit 1
+fi
+
+REPO=""
+RUN_ID=""
+
+# First arg is the URL or run ID
+INPUT="$1"
+shift
+
+# Parse remaining arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --repo)
+      REPO="$2"
+      shift 2
+      ;;
+    *)
+      echo "❌ Unknown option: $1"
+      print_usage
+      exit 1
+      ;;
+  esac
+done
+
+# Parse URL or use numeric ID
+if [[ "$INPUT" =~ ^https://github\.com/([^/]+/[^/]+)/actions/runs/([0-9]+) ]]; then
+  REPO="${match[1]}"
+  RUN_ID="${match[2]}"
+elif [[ "$INPUT" =~ ^[0-9]+$ ]]; then
+  RUN_ID="$INPUT"
+else
+  echo "❌ Invalid input: $INPUT"
+  echo "   Provide a full GitHub Actions run URL or a numeric run ID."
+  exit 1
+fi
+
+if [[ -z "$REPO" ]]; then
+  echo "❌ --repo is required when using a numeric run ID"
+  exit 1
+fi
+
+echo "⏳ Force cancelling run $RUN_ID in $REPO..."
+
+# Use force-cancel to skip graceful shutdown
+if gh api "repos/$REPO/actions/runs/$RUN_ID/force-cancel" --method POST 2>/dev/null; then
+  echo "✅ Force cancel requested for run $RUN_ID"
+else
+  # Fall back to regular cancel if force-cancel fails (e.g., not yet supported or already completed)
+  echo "⚠️  Force cancel failed, trying regular cancel..."
+  if gh api "repos/$REPO/actions/runs/$RUN_ID/cancel" --method POST 2>/dev/null; then
+    echo "✅ Cancel requested for run $RUN_ID"
+  else
+    echo "❌ Failed to cancel run $RUN_ID (may already be completed or cancelled)"
+    exit 1
+  fi
+fi

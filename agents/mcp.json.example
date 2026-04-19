@@ -5,19 +5,11 @@
       "args": ["mcp-atlassian"],
       "env": {
         "JIRA_URL": "https://talkdesk.atlassian.net",
-        "JIRA_USERNAME": "${ATLASSIAN_USER_EMAIL}",
-        "JIRA_API_TOKEN": "${ATLASSIAN_API_TOKEN}",
+        "JIRA_USERNAME": "${env:ATLASSIAN_USER_EMAIL}",
+        "JIRA_API_TOKEN": "${env:ATLASSIAN_API_TOKEN}",
         "CONFLUENCE_URL": "https://talkdesk.atlassian.net/wiki",
-        "CONFLUENCE_USERNAME": "${ATLASSIAN_USER_EMAIL}",
-        "CONFLUENCE_API_TOKEN": "${ATLASSIAN_API_TOKEN}"
-      },
-      "autoStart": false
-    },
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+        "CONFLUENCE_USERNAME": "${env:ATLASSIAN_USER_EMAIL}",
+        "CONFLUENCE_API_TOKEN": "${env:ATLASSIAN_API_TOKEN}"
       },
       "autoStart": false
     },
@@ -36,21 +28,10 @@
       "command": "uvx",
       "args": ["workspace-mcp"],
       "env": {
-        "GOOGLE_OAUTH_CLIENT_ID": "${GOOGLE_OAUTH_CLIENT_ID}",
-        "GOOGLE_OAUTH_CLIENT_SECRET": "${GOOGLE_OAUTH_CLIENT_SECRET}"
+        "GOOGLE_OAUTH_CLIENT_ID": "${env:GOOGLE_OAUTH_CLIENT_ID}",
+        "GOOGLE_OAUTH_CLIENT_SECRET": "${env:GOOGLE_OAUTH_CLIENT_SECRET}"
       },
       "autoStart": false
-    },
-    "designmd": {
-      "command": "npx",
-      "args": ["designmd-mcp"],
-      "env": {
-        "DESIGNMD_API_KEY": "${DESIGNMD_API_KEY}"
-      }
-    },
-    "figma": {
-      "url": "https://mcp.figma.com/mcp",
-      "type": "http"
     }
   },
   "mcpServices": {
@@ -67,14 +48,6 @@
       },
       "autoStart": false
     },
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-      },
-      "autoStart": false
-    },
     "talkdesk-developer-mcp": {
       "command": "npx",
       "args": [
@@ -94,13 +67,6 @@
         "GOOGLE_OAUTH_CLIENT_SECRET": "${GOOGLE_OAUTH_CLIENT_SECRET}"
       },
       "autoStart": false
-    },
-    "designmd": {
-      "command": "npx",
-      "args": ["designmd-mcp"],
-      "env": {
-        "DESIGNMD_API_KEY": "${DESIGNMD_API_KEY}"
-      }
     }
   }
 }
