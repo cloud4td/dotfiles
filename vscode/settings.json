@@ -11,7 +11,7 @@
   "editor.formatOnPaste": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
-    "source.organizeImports": "explicit"
+    "source.organizeImports": "explicit",
   },
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": true,
@@ -26,11 +26,11 @@
   "editor.quickSuggestions": {
     "other": true,
     "comments": false,
-    "strings": true
+    "strings": true,
   },
 
   // Workbench
-  "workbench.colorTheme": "GitHub Dark Default",
+  "workbench.colorTheme": "GitHub Dark",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.startupEditor": "none",
   "workbench.editor.enablePreview": false,
@@ -50,12 +50,12 @@
     "**/node_modules": true,
     "**/__pycache__": true,
     "**/.pytest_cache": true,
-    "**/*.pyc": true
+    "**/*.pyc": true,
   },
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/node_modules/**": true,
-    "**/.venv/**": true
+    "**/.venv/**": true,
   },
 
   // Terminal
@@ -66,18 +66,18 @@
   "terminal.integrated.scrollback": 10000,
   "terminal.integrated.profiles.osx": {
     "Human Zsh": {
-      "path": "zsh"
+      "path": "zsh",
     },
     "Agent Zsh (Dumb Mode)": {
       "path": "zsh",
       "env": {
-        "AGENT_MODE": "1"
-      }
-    }
+        "AGENT_MODE": "1",
+      },
+    },
   },
   "terminal.integrated.defaultProfile.osx": "Human Zsh",
   "terminal.integrated.env.osx": {
-    "PATH": "/opt/homebrew/bin:/opt/homebrew/sbin:${env:PATH}"
+    "PATH": "/opt/homebrew/bin:/opt/homebrew/sbin:${env:PATH}",
   },
 
   // Git
@@ -92,7 +92,7 @@
     "*": true,
     "yaml": true,
     "plaintext": false,
-    "markdown": true
+    "markdown": true,
   },
 
   // Language Specific
@@ -105,16 +105,16 @@
   "javascript.format.semicolons": "insert",
   "typescript.format.semicolons": "insert",
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "[javascriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
 
   // Python
@@ -123,8 +123,8 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
-      "source.organizeImports": "explicit"
-    }
+      "source.organizeImports": "explicit",
+    },
   },
   "python.languageServer": "Pylance",
   "python.analysis.typeCheckingMode": "basic",
@@ -132,15 +132,15 @@
 
   // JSON
   "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
 
   // YAML
   "[yaml]": {
-    "editor.defaultFormatter": "redhat.vscode-yaml"
+    "editor.defaultFormatter": "redhat.vscode-yaml",
   },
 
   // Markdown
@@ -150,22 +150,22 @@
     "editor.quickSuggestions": {
       "comments": "off",
       "strings": "off",
-      "other": "off"
-    }
+      "other": "off",
+    },
   },
 
   // Shell
   "[shellscript]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format"
+    "editor.defaultFormatter": "foxundermoon.shell-format",
   },
 
   // File associations — gitignore files (no extension) must not be formatted by Prettier
   "files.associations": {
     "*gitignore*": "ignore",
-    "*.gitignore": "ignore"
+    "*.gitignore": "ignore",
   },
   "[ignore]": {
-    "editor.formatOnSave": false
+    "editor.formatOnSave": false,
   },
 
   // Prettier
@@ -189,7 +189,7 @@
     "**/build": true,
     "**/.next": true,
     "**/.venv": true,
-    "**/__pycache__": true
+    "**/__pycache__": true,
   },
   "snyk.advanced.cliPath": "/Users/cloud/Library/Application Support/snyk/vscode-cli/snyk-macos-arm64",
   "snyk.folderConfigs": [
@@ -204,14 +204,14 @@
       "featureFlags": {
         "internal_iaw_enabled": false,
         "snykCodeConsistentIgnores": true,
-        "snykCodeInlineIgnore": true
+        "snykCodeInlineIgnore": true,
       },
       "sastSettings": {
         "sastEnabled": true,
         "localCodeEngine": {
           "allowCloudUpload": false,
           "url": "",
-          "enabled": false
+          "enabled": false,
         },
         "org": "applications-Svy9QPjJxqSKEPp3XRXFL4",
         "supportedLanguages": [
@@ -260,12 +260,12 @@
           ".hpp",
           ".cc",
           ".cxx",
-          ".hxx"
+          ".hxx",
         ],
         "reportFalsePositivesEnabled": true,
-        "autofixEnabled": true
-      }
-    }
+        "autofixEnabled": true,
+      },
+    },
   ],
   "snyk.trustedFolders": ["/Users/cloud/work/talkdesk/code/dotfiles"],
   "snyk.automaticAuthentication": "true",
@@ -284,7 +284,7 @@
   "github.copilot.chat.agent.runTasks": true,
   "github.copilot.chat.agent.autoFix": true,
   "github.copilot.chat": {
-    "queueMode": true
+    "queueMode": true,
   },
 
   // Claude Code (VS Code extension)
@@ -297,7 +297,13 @@
   "githubPullRequests.pullBranch": "never",
   "markdown-preview-enhanced.codeBlockTheme": "auto.css",
   "markdown-preview-enhanced.previewTheme": "github-light.css",
-  "imageCarousel.explorerContextMenu.enabled": true
+  "imageCarousel.explorerContextMenu.enabled": true,
+  "chat.plugins.marketplaces": [
+    "github/copilot-plugins",
+    "github/awesome-copilot",
+    "EveryInc/compound-engineering-plugin",
+    "https://github.com/obra/superpowers",
+  ],
 
   // Note: Snyk configurations (snyk.folderConfigs, snyk.advanced.cliPath, etc.)
   // contain hardcoded user-specific paths and are auto-generated by Snyk extension.
