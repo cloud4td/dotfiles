@@ -3,10 +3,10 @@
 # Loaded by .zshenv, applies to all shells (interactive and non-interactive)
 
 # Homebrew (must be first to ensure brew-installed tools are available)
-if [[ -d "/opt/homebrew" ]]; then
+if [[ -x "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
+  export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.aliyun.com/homebrew/homebrew-bottles
 fi
-export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.aliyun.com/homebrew/homebrew-bottles
 
 # Dotfiles bin directory (custom commands)
 export PATH="$HOME/dotfiles/bin:$PATH"
