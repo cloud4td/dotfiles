@@ -31,3 +31,5 @@ _.swo
 # Environment
 
 .env.local
+
+**/.claude/settings.local.json
