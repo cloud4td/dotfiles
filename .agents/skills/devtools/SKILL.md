@@ -1,6 +1,16 @@
 ---
 name: devtools
-description: Custom development workflow automation tools for GitHub Actions, PR management, and code documentation generation. Use when the user asks about or wants to: (1) Run GitHub workflows, (2) Approve GitHub Action environment gates, (3) Auto-approve PRs, (4) Create PRs with signed commits, (5) Generate code documentation or knowledge base prompts from codebases, (6) Work with repository documentation, (7) Trigger CI/CD pipelines. Triggers on keywords like "github workflow", "approve PR", "sign commits", "generate docs", "code documentation", "knowledge base", or mentions of specific command names (gh-run-approve, auto-approve-pr-workflow, sign-commit-pr, generate-kb-prompts).
+description: >-
+  Custom development workflow automation tools for GitHub Actions, PR
+  management, and code documentation generation. Use when the user asks about or
+  wants to: (1) Run GitHub workflows, (2) Approve GitHub Action environment
+  gates, (3) Auto-approve PRs, (4) Create PRs with signed commits, (5) Generate
+  code documentation or knowledge base prompts from codebases, (6) Work with
+  repository documentation, (7) Trigger CI/CD pipelines. Triggers on keywords
+  like "github workflow", "approve PR", "sign commits", "generate docs",
+  "code documentation", "knowledge base", or mentions of specific command names
+  (gh-run-approve, auto-approve-pr-workflow, sign-commit-pr,
+  generate-kb-prompts).
 ---
 
 # Development Workflow Tools
