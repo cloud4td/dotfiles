@@ -1,0 +1,282 @@
+#!/usr/bin/env bash
+# Upgrades .nvmrc, .python-version, and .sdkmanrc to the latest available
+# version within the same pinned major/minor series.
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DRY_RUN=false
+ANY_CHANGED=false
+
+usage() {
+  echo "Usage: $(basename "$0") [--dry-run] [--help]"
+  echo ""
+  echo "Upgrades version files to the latest patch in each pinned series:"
+  echo "  .nvmrc           Node.js (via nvm)"
+  echo "  .python-version  Python  (via pyenv)"
+  echo "  .sdkmanrc        SDKs    (via sdkman)"
+  echo ""
+  echo "  --dry-run    Print proposed changes without modifying files"
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run) DRY_RUN=true ;;
+    --help|-h) usage; exit 0 ;;
+    *) echo "Unknown option: $arg"; usage >&2; exit 1 ;;
+  esac
+done
+
+log_ok()     { echo "  [ok] $*"; }
+log_change() { echo "  [->] $*"; ANY_CHANGED=true; }
+log_skip()   { echo "  [--] $*"; }
+
+# Replaces an exact line in a file (first occurrence).
+replace_line() {
+  local file="$1" old="$2" new="$3"
+  if [[ "$DRY_RUN" == false ]]; then
+    perl -i -pe "s/^\Q${old}\E\$/${new}/ if \$. == 1 || !done; \$done++ if /^\Q${old}\E\$/" "$file"
+    # Simpler: replace first matching line
+    perl -i -pe "s/^\Q${old}\E\$/${new}/ && (\$done=1) unless \$done" "$file"
+  fi
+}
+
+maybe_update_line() {
+  local file="$1" old="$2" new="$3" label="${4:-}"
+  local display="${label:-$old}"
+  if [[ "$old" == "$new" ]]; then
+    log_ok "${file##*/}: $display is already latest ($old)"
+  else
+    log_change "${file##*/}: $display  $old → $new"
+    if [[ "$DRY_RUN" == false ]]; then
+      sed -i.bak "s|^${old}$|${new}|" "$file" && rm -f "${file}.bak"
+    fi
+  fi
+}
+
+# ─── fnm / nvm ────────────────────────────────────────────────────────────────
+
+# Returns the latest Node.js full version for a given major, using fnm or nvm.
+node_latest_in_major() {
+  local major="$1"
+
+  if command -v fnm &>/dev/null; then
+    fnm list-remote 2>/dev/null \
+      | grep -oE "^v${major}\.[0-9]+\.[0-9]+" \
+      | sort -V \
+      | tail -1 \
+      | tr -d 'v'
+  else
+    # Source nvm on demand (shell function, not a binary)
+    if ! type nvm &>/dev/null 2>&1; then
+      export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+      [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh" --no-use
+    fi
+    type nvm &>/dev/null 2>&1 || return 1
+    nvm ls-remote "$major" 2>/dev/null \
+      | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' \
+      | sort -V \
+      | tail -1 \
+      | tr -d 'v'
+  fi
+}
+
+upgrade_node() {
+  local nvmrc="$REPO_ROOT/.nvmrc"
+  [[ -f "$nvmrc" ]] || return 0
+  echo ""
+  echo "Node.js (.nvmrc):"
+
+  local pinned major
+  pinned=$(cat "$nvmrc")
+  major=$(echo "$pinned" | grep -oE '^v?([0-9]+)' | tr -d 'v')
+
+  local latest
+  latest=$(node_latest_in_major "$major" || true)
+
+  if [[ -z "$latest" ]]; then
+    log_skip "could not query available Node $major versions (fnm/nvm not found?)"
+    return 0
+  fi
+
+  # Major-only pin (e.g. "24") — fnm/nvm resolve it at install time, no edit needed
+  if [[ "$pinned" =~ ^v?[0-9]+$ ]]; then
+    log_ok ".nvmrc: major-only pin \"$pinned\" — latest is v$latest (no change needed)"
+  else
+    maybe_update_line "$nvmrc" "$pinned" "$latest"
+  fi
+}
+
+# ─── uv (Python) ──────────────────────────────────────────────────────────────
+
+upgrade_uv_python() {
+  local pyver="$REPO_ROOT/.python-version"
+  [[ -f "$pyver" ]] || return 0
+  echo ""
+  echo "Python (.python-version):"
+
+  if ! command -v uv &>/dev/null; then
+    log_skip "uv not found"
+    return 0
+  fi
+
+  # uv python list format: cpython-3.12.13-macos-aarch64-none  <path or download>
+  # Extract just the cpython version numbers, exclude pre-releases (b, rc, a suffixes)
+  local available
+  available=$(uv python list 2>/dev/null \
+    | grep -oE 'cpython-[0-9]+\.[0-9]+\.[0-9]+-' \
+    | grep -vE -e '-(a|b|rc)[0-9]' \
+    | sed 's/cpython-//; s/-$//' \
+    | sort -Vu || true)
+
+  while IFS= read -r pinned || [[ -n "$pinned" ]]; do
+    [[ -z "$pinned" ]] && continue
+
+    local series
+    if [[ "$pinned" =~ ^([0-9]+\.[0-9]+)\.[0-9]+$ ]]; then
+      series="${BASH_REMATCH[1]}"
+    elif [[ "$pinned" =~ ^([0-9]+\.[0-9]+)$ ]]; then
+      series="$pinned"
+    else
+      log_skip "unrecognised version format: $pinned"
+      continue
+    fi
+
+    local escaped="${series//./\\.}"
+    local latest
+    latest=$(echo "$available" \
+      | grep -E "^${escaped}\.[0-9]+$" \
+      | sort -V \
+      | tail -1 || true)
+
+    if [[ -z "$latest" ]]; then
+      log_skip "Python: could not find latest for $series"
+      continue
+    fi
+
+    if [[ "$pinned" =~ ^[0-9]+\.[0-9]+$ ]]; then
+      log_ok ".python-version: minor-only pin \"$pinned\" — latest patch is $latest (no change needed)"
+    else
+      maybe_update_line "$pyver" "$pinned" "$latest"
+    fi
+  done < "$pyver"
+}
+
+# ─── sdkman ───────────────────────────────────────────────────────────────────
+
+export SDKMAN_DIR="${SDKMAN_DIR:-$HOME/.sdkman}"
+
+# Run sdk in a subshell with nounset disabled — sdkman references many variables
+# that may be unset in bash, causing failures under set -u.
+sdk_run() {
+  (
+    set +u
+    [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] || exit 1
+    source "$SDKMAN_DIR/bin/sdkman-init.sh"
+    sdk "$@" 2>/dev/null
+  )
+}
+
+sdkman_available() {
+  [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]]
+}
+
+# Returns the latest stable identifier in the same series from `sdk list`.
+# Handles two output formats:
+#   table (java, kotlin, scala): pipe-separated, identifier in last column
+#   columnar (gradle, maven, etc.): space-separated version tokens
+sdk_latest_in_series() {
+  local candidate="$1"
+  local current="$2"
+
+  # Split vendor suffix: 21.0.11-tem -> version_part=21.0.11, suffix=-tem
+  local suffix="" version_part="$current"
+  if [[ "$current" =~ ^([0-9][0-9.]*)-([a-z0-9]+)$ ]]; then
+    version_part="${BASH_REMATCH[1]}"
+    suffix="-${BASH_REMATCH[2]}"
+  fi
+
+  # Build series prefix: 3-part version → match major.minor.*, 2-part → major.*
+  local parts
+  IFS='.' read -ra parts <<< "$version_part"
+  local series_re
+  if (( ${#parts[@]} >= 3 )); then
+    series_re="^${parts[0]}\\.${parts[1]}\\."
+  else
+    series_re="^${parts[0]}\\."
+  fi
+
+  local raw
+  raw=$(sdk_run list "$candidate")
+
+  local all_versions
+  if echo "$raw" | grep -q '|'; then
+    # Table format: identifier is the last pipe-delimited field
+    all_versions=$(echo "$raw" \
+      | grep '|' \
+      | awk -F'|' '{gsub(/[[:space:]]/, "", $NF); print $NF}' \
+      | grep -v '^$')
+  else
+    # Columnar format: extract bare version tokens from the body lines
+    all_versions=$(echo "$raw" \
+      | grep -oE '[0-9]+\.[0-9]+[.0-9]*' \
+      | grep -v '^$')
+  fi
+
+  echo "$all_versions" \
+    | grep -E "$series_re" \
+    | grep -- "${suffix}$" \
+    | grep -vE -e '-(rc|beta|alpha|milestone|M)[0-9.-]' \
+    | sort -V \
+    | tail -1
+}
+
+upgrade_sdkman() {
+  local sdkmanrc="$REPO_ROOT/.sdkmanrc"
+  [[ -f "$sdkmanrc" ]] || return 0
+  echo ""
+  echo "SDKMAN (.sdkmanrc):"
+
+  if ! sdkman_available; then
+    log_skip "sdkman not found"
+    return 0
+  fi
+
+  while IFS='=' read -r key value || [[ -n "$key" ]]; do
+    [[ "$key" =~ ^# || -z "$key" || -z "$value" ]] && continue
+
+    local latest
+    latest=$(sdk_latest_in_series "$key" "$value" || true)
+
+    if [[ -z "$latest" ]]; then
+      log_skip "$key: could not determine latest for $value"
+    elif [[ "$latest" == "$value" ]]; then
+      log_ok ".sdkmanrc: $key=$value (already latest)"
+    else
+      log_change ".sdkmanrc: ${key}=${value} → ${latest}"
+      if [[ "$DRY_RUN" == false ]]; then
+        sed -i.bak "s|^${key}=${value}$|${key}=${latest}|" "$sdkmanrc" && rm -f "${sdkmanrc}.bak"
+      fi
+    fi
+  done < "$sdkmanrc"
+}
+
+# ─── main ─────────────────────────────────────────────────────────────────────
+
+cd "$REPO_ROOT"
+[[ "$DRY_RUN" == true ]] && echo "(dry run)"
+
+upgrade_node
+upgrade_uv_python
+upgrade_sdkman
+
+echo ""
+if [[ "$DRY_RUN" == true && "$ANY_CHANGED" == true ]]; then
+  echo "Run without --dry-run to apply changes."
+elif [[ "$ANY_CHANGED" == true ]]; then
+  echo "Files updated. Apply the new versions:"
+  echo "  fnm install && fnm use   # or: nvm install && nvm use"
+  echo "  uv python install"
+  echo "  sdk env install"
+else
+  echo "All versions are already up to date."
+fi

@@ -2,8 +2,8 @@
 # When sdkman_auto_env=true, SDKs will automatically switch when entering this directory
 # This is automatically configured by scripts/setup-sdkman.sh
 # Add key=value pairs of SDKs to use below
-java=17.0.17-tem
-maven=3.9.11
-gradle=8.5
+java=21.0.11-tem
+maven=3.9.16
+gradle=8.14.5
 kotlin=2.2.21
 scala=3.7.4
